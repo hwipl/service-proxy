@@ -39,6 +39,11 @@ func runTCPForwarder(srvConn, dstConn net.Conn) {
 		dstData: make(chan []byte),
 	}
 
+	// read data from connections to channels
+	go tcpReadToChannel(fwd.srvConn, fwd.srvData)
+	go tcpReadToChannel(fwd.dstConn, fwd.dstData)
+
+	// start forwarding traffic
 	for {
 		select {
 		case data, more := <-fwd.srvData:
