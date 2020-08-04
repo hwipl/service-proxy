@@ -29,11 +29,16 @@ func runTCPService(srvAddr, dstAddr *net.TCPAddr) {
 	defer listener.Close()
 	srv.listener = listener
 	for {
-		conn, err := listener.Accept()
+		// get new service connection
+		srvConn, err := listener.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
-		// TODO: handle connection
-		conn.Close()
+
+		// open connection to proxy destination
+		dstConn, err := net.DialTCP("tcp", nil, dstAddr)
+
+		// start forwarding traffic between connections
+		go runTCPForwarder(srvConn, dstConn)
 	}
 }
