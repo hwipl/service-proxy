@@ -29,6 +29,19 @@ func tcpReadToChannel(conn net.Conn, channel chan<- []byte) {
 	}
 }
 
+// tcpWriteToConn writes data to conn
+func tcpWriteToConn(conn net.Conn, data []byte) {
+	count := 0
+	for count < len(data) {
+		n, err := conn.Write(data[count:])
+		if err != nil {
+			// do more in this case? abort connection?
+			return
+		}
+		count += n
+	}
+}
+
 // runTCPForwarder starts forwarding traffic between a connection to the
 // service proxy and a connection to the destination
 func runTCPForwarder(srvConn, dstConn net.Conn) {
@@ -58,7 +71,7 @@ func runTCPForwarder(srvConn, dstConn net.Conn) {
 				break
 			}
 			// copy data from service peer to destination
-			fwd.dstConn.Write(data)
+			tcpWriteToConn(fwd.dstConn, data)
 		case data, more := <-fwd.dstData:
 			if !more {
 				// no more data from destination connection,
@@ -71,7 +84,7 @@ func runTCPForwarder(srvConn, dstConn net.Conn) {
 				break
 			}
 			// copy data from destination to service peer
-			fwd.srvConn.Write(data)
+			tcpWriteToConn(fwd.srvConn, data)
 		}
 
 		// if both channels are closed, stop
