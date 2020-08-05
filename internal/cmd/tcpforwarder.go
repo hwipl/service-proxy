@@ -48,14 +48,26 @@ func runTCPForwarder(srvConn, dstConn net.Conn) {
 		select {
 		case data, more := <-fwd.srvData:
 			if !more {
+				// no more data from service connection,
+				// disable channel, close reading side of
+				// service connection and close writing side of
+				// destination connection
 				fwd.srvData = nil
+				fwd.srvConn.(*net.TCPConn).CloseRead()
+				fwd.dstConn.(*net.TCPConn).CloseWrite()
 				break
 			}
 			// copy data from service peer to destination
 			fwd.dstConn.Write(data)
 		case data, more := <-fwd.dstData:
 			if !more {
+				// no more data from destination connection,
+				// disable channel, close reading side of
+				// destination connection and close writing
+				// side of service connection
 				fwd.dstData = nil
+				fwd.dstConn.(*net.TCPConn).CloseRead()
+				fwd.srvConn.(*net.TCPConn).CloseWrite()
 				break
 			}
 			// copy data from destination to service peer
@@ -67,8 +79,4 @@ func runTCPForwarder(srvConn, dstConn net.Conn) {
 			break
 		}
 	}
-
-	// close everything
-	srvConn.Close()
-	dstConn.Close()
 }
