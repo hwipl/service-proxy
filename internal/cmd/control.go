@@ -26,8 +26,9 @@ func (c *control) runControl() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// TODO: do something with conn
-		conn.Close()
+
+		// handle client connection
+		handleClient(conn)
 	}
 }
 
