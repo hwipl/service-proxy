@@ -32,7 +32,7 @@ func (t *tcpService) runService() {
 		dstConn, err := net.DialTCP("tcp", nil, t.dstAddr)
 
 		// start forwarding traffic between connections
-		go runTCPForwarder(srvConn, dstConn)
+		runTCPForwarder(srvConn, dstConn)
 	}
 }
 
