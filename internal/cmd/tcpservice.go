@@ -30,6 +30,10 @@ func (t *tcpService) runService() {
 
 		// open connection to proxy destination
 		dstConn, err := net.DialTCP("tcp", nil, t.dstAddr)
+		if err != nil {
+			srvConn.Close()
+			continue
+		}
 
 		// start forwarding traffic between connections
 		runTCPForwarder(srvConn, dstConn)
