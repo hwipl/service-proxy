@@ -7,6 +7,10 @@ import (
 	"log"
 )
 
+const (
+	messageLen = 6
+)
+
 // message stores a control message
 type message struct {
 	op       uint8
