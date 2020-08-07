@@ -8,6 +8,7 @@ import (
 // client stores control client information
 type client struct {
 	conn net.Conn
+	ip   net.IP
 }
 
 // handleClient handles the client and its control connection
@@ -43,6 +44,7 @@ func readFromConn(conn net.Conn) []byte {
 func handleClient(conn net.Conn) {
 	c := client{
 		conn: conn,
+		ip:   conn.RemoteAddr().(*net.TCPAddr).IP,
 	}
 	go c.handleClient()
 }
