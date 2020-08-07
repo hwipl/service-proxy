@@ -11,6 +11,36 @@ type client struct {
 	ip   net.IP
 }
 
+// addTCPService adds a tcp service to the client
+func (c *client) addTCPService(port, destPort int) {
+	fmt.Printf("adding new tcp service for client %s: forward port %d "+
+		"to port %d\n", c.ip, port, destPort)
+
+	// create tcp addresses and start tcp service
+	srvAddr := net.TCPAddr{
+		IP:   net.IPv4(0, 0, 0, 0),
+		Port: port,
+	}
+	dstAddr := net.TCPAddr{
+		IP:   c.ip,
+		Port: destPort,
+	}
+	runTCPService(&srvAddr, &dstAddr)
+}
+
+// addService adds a service to the client
+func (c *client) addService(protocol uint8, port, destPort uint16) {
+	switch protocol {
+	case protocolTCP:
+		c.addTCPService(int(port), int(destPort))
+	case protocolUDP:
+		// not implemented
+	default:
+		// unknown protocol, stop here
+		return
+	}
+}
+
 // handleClient handles the client and its control connection
 func (c *client) handleClient() {
 	defer c.conn.Close()
@@ -23,6 +53,17 @@ func (c *client) handleClient() {
 			return
 		}
 		msg.parse(buf)
+
+		// handle message types
+		switch msg.op {
+		case messageAdd:
+			c.addService(msg.protocol, msg.port, msg.destPort)
+		case messageDel:
+			// not implemented
+		default:
+			// unknown message, stop here
+			return
+		}
 	}
 }
 
