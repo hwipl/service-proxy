@@ -9,6 +9,12 @@ import (
 
 const (
 	messageLen = 6
+
+	// message types
+	messageOK  = 1
+	messageAdd = 2
+	messageDel = 3
+	messageErr = 4
 )
 
 // message stores a control message
