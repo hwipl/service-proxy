@@ -15,6 +15,10 @@ const (
 	messageAdd = 2
 	messageDel = 3
 	messageErr = 4
+
+	// protocol numbers
+	protocolTCP = 6
+	protocolUDP = 17
 )
 
 // message stores a control message
