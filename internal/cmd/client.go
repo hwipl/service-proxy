@@ -47,6 +47,7 @@ func (c *client) addService(protocol uint8, port, destPort uint16) {
 // handleClient handles the client and its control connection
 func (c *client) handleClient() {
 	defer c.conn.Close()
+	defer c.stopClient()
 	for {
 		// read a message from the connection and parse it
 		var msg message
@@ -67,6 +68,14 @@ func (c *client) handleClient() {
 			// unknown message, stop here
 			return
 		}
+	}
+}
+
+// stopClient stops active client services
+func (c *client) stopClient() {
+	for port := range c.tcpPorts {
+		tcpServices.get(port).stopService()
+		tcpServices.del(port)
 	}
 }
 
