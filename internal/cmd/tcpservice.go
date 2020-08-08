@@ -38,7 +38,7 @@ func (t tcpServiceMap) del(port int) {
 	t.m.Lock()
 	defer t.m.Unlock()
 
-	t.s[port] = nil
+	delete(t.s, port)
 }
 
 // tcpService stores tcp service proxy information
