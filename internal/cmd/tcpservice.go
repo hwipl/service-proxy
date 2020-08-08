@@ -3,7 +3,38 @@ package cmd
 import (
 	"log"
 	"net"
+	"sync"
 )
+
+// tcpServiceMap stores active tcp services identified by port
+type tcpServiceMap struct {
+	m sync.Mutex
+	s map[int]*tcpService
+}
+
+// add adds the service entry identified by port to the tcpServiceMap and
+// returns true if successful
+func (t tcpServiceMap) add(port int, service *tcpService) bool {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	if t.s == nil {
+		t.s = make(map[int]*tcpService)
+	}
+	if t.s[port] == nil {
+		t.s[port] = service
+		return true
+	}
+	return false
+}
+
+// del removes the service identified by port from the tcpServiceMap
+func (t tcpServiceMap) del(port int) {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	t.s[port] = nil
+}
 
 // tcpService stores tcp service proxy information
 type tcpService struct {
