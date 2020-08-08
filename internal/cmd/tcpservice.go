@@ -6,6 +6,11 @@ import (
 	"sync"
 )
 
+var (
+	// tcpServices stores all active tcp services identified by port
+	tcpServices tcpServiceMap
+)
+
 // tcpServiceMap stores active tcp services identified by port
 type tcpServiceMap struct {
 	m sync.Mutex
@@ -80,6 +85,8 @@ func runTCPService(srvAddr, dstAddr *net.TCPAddr) {
 		dstAddr: dstAddr,
 	}
 
-	// run service
-	go srv.runService()
+	if tcpServices.add(srvAddr.Port, &srv) {
+		// run service
+		go srv.runService()
+	}
 }
