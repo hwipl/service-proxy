@@ -76,6 +76,14 @@ func (t *tcpService) runService() {
 	}
 }
 
+// stopService stops the tcp service proxy
+func (t *tcpService) stopService() {
+	// this will probably cause issues in runService()
+	t.listener.Close()
+	// this is pretty gracefully. active forwarder connections will remain
+	// open until they are done. also close active forwarders?
+}
+
 // runTCPService runs a tcp service proxy that listens on srvAddr and forwards
 // incoming connections to dstAddr
 func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
