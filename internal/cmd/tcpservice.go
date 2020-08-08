@@ -78,7 +78,7 @@ func (t *tcpService) runService() {
 
 // runTCPService runs a tcp service proxy that listens on srvAddr and forwards
 // incoming connections to dstAddr
-func runTCPService(srvAddr, dstAddr *net.TCPAddr) {
+func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
 	// create service
 	srv := tcpService{
 		srvAddr: srvAddr,
@@ -88,5 +88,8 @@ func runTCPService(srvAddr, dstAddr *net.TCPAddr) {
 	if tcpServices.add(srvAddr.Port, &srv) {
 		// run service
 		go srv.runService()
+		return &srv
 	}
+
+	return nil
 }
