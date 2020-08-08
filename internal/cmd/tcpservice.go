@@ -19,7 +19,7 @@ type tcpServiceMap struct {
 
 // add adds the service entry identified by port to the tcpServiceMap and
 // returns true if successful
-func (t tcpServiceMap) add(port int, service *tcpService) bool {
+func (t *tcpServiceMap) add(port int, service *tcpService) bool {
 	t.m.Lock()
 	defer t.m.Unlock()
 
@@ -34,7 +34,7 @@ func (t tcpServiceMap) add(port int, service *tcpService) bool {
 }
 
 // del removes the service identified by port from the tcpServiceMap
-func (t tcpServiceMap) del(port int) {
+func (t *tcpServiceMap) del(port int) {
 	t.m.Lock()
 	defer t.m.Unlock()
 
