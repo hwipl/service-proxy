@@ -41,6 +41,14 @@ func (t *tcpServiceMap) del(port int) {
 	delete(t.s, port)
 }
 
+// get gets the service identified by port from the tcpServiceMap
+func (t *tcpServiceMap) get(port int) *tcpService {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	return t.s[port]
+}
+
 // tcpService stores tcp service proxy information
 type tcpService struct {
 	srvAddr  *net.TCPAddr
