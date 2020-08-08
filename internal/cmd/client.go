@@ -7,8 +7,9 @@ import (
 
 // client stores control client information
 type client struct {
-	conn net.Conn
-	ip   net.IP
+	conn     net.Conn
+	ip       net.IP
+	tcpPorts map[int]bool
 }
 
 // addTCPService adds a tcp service to the client
@@ -25,7 +26,9 @@ func (c *client) addTCPService(port, destPort int) {
 		IP:   c.ip,
 		Port: destPort,
 	}
-	runTCPService(&srvAddr, &dstAddr)
+	if runTCPService(&srvAddr, &dstAddr) != nil {
+		c.tcpPorts[port] = true
+	}
 }
 
 // addService adds a service to the client
@@ -84,8 +87,9 @@ func readFromConn(conn net.Conn) []byte {
 // handleClient handles the client with its control connection conn
 func handleClient(conn net.Conn) {
 	c := client{
-		conn: conn,
-		ip:   conn.RemoteAddr().(*net.TCPAddr).IP,
+		conn:     conn,
+		ip:       conn.RemoteAddr().(*net.TCPAddr).IP,
+		tcpPorts: make(map[int]bool),
 	}
 	go c.handleClient()
 }
