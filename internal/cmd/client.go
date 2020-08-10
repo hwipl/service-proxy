@@ -8,14 +8,14 @@ import (
 // client stores control client information
 type client struct {
 	conn     net.Conn
-	ip       net.IP
+	addr     *net.TCPAddr
 	tcpPorts map[int]bool
 }
 
 // addTCPService adds a tcp service to the client
 func (c *client) addTCPService(port, destPort int) {
-	fmt.Printf("adding new tcp service for client %s: forward port %d "+
-		"to port %d\n", c.ip, port, destPort)
+	fmt.Printf("Adding new tcp service for client %s: forward port %d "+
+		"to port %d\n", c.addr, port, destPort)
 
 	// create tcp addresses and start tcp service
 	srvAddr := net.TCPAddr{
@@ -23,7 +23,7 @@ func (c *client) addTCPService(port, destPort int) {
 		Port: port,
 	}
 	dstAddr := net.TCPAddr{
-		IP:   c.ip,
+		IP:   c.addr.IP,
 		Port: destPort,
 	}
 	if runTCPService(&srvAddr, &dstAddr) != nil {
@@ -48,12 +48,13 @@ func (c *client) addService(protocol uint8, port, destPort uint16) {
 func (c *client) handleClient() {
 	defer c.conn.Close()
 	defer c.stopClient()
+	fmt.Println("New connection from client", c.addr)
 	for {
 		// read a message from the connection and parse it
 		var msg message
 		buf := readFromConn(c.conn)
 		if buf == nil {
-			fmt.Println("error reading from control client")
+			fmt.Println("Closing connection to client", c.addr)
 			return
 		}
 		msg.parse(buf)
@@ -97,7 +98,7 @@ func readFromConn(conn net.Conn) []byte {
 func handleClient(conn net.Conn) {
 	c := client{
 		conn:     conn,
-		ip:       conn.RemoteAddr().(*net.TCPAddr).IP,
+		addr:     conn.RemoteAddr().(*net.TCPAddr),
 		tcpPorts: make(map[int]bool),
 	}
 	go c.handleClient()
