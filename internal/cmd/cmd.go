@@ -7,11 +7,17 @@ import (
 )
 
 var (
+	// serverAddr is the default listen address of the control server
 	serverAddr = ":32323"
 )
 
 // run in server mode
-func runServer(cntrlAddr *net.TCPAddr) {
+func runServer() {
+	// parse server address
+	cntrlAddr, err := net.ResolveTCPAddr("tcp", serverAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
 	runControl(cntrlAddr)
 }
 
@@ -22,12 +28,7 @@ func parseCommandLine() {
 		"start server (default) and listen on `address`")
 	flag.Parse()
 
-	// parse server address
-	cntrlAddr, err := net.ResolveTCPAddr("tcp", serverAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	runServer(cntrlAddr)
+	runServer()
 }
 
 // Run is the main entry point
