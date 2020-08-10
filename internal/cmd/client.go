@@ -59,9 +59,9 @@ func (c *client) handleClient() {
 		msg.parse(buf)
 
 		// handle message types
-		switch msg.op {
+		switch msg.Op {
 		case messageAdd:
-			c.addService(msg.protocol, msg.port, msg.destPort)
+			c.addService(msg.Protocol, msg.Port, msg.DestPort)
 		case messageDel:
 			// not implemented
 		default:

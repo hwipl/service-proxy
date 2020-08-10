@@ -16,15 +16,15 @@ type serviceSpec struct {
 // toMessage converts a service specification to a message
 func (s *serviceSpec) toMessage() *message {
 	m := message{
-		op:       messageAdd,
-		port:     s.port,
-		destPort: s.destPort,
+		Op:       messageAdd,
+		Port:     s.port,
+		DestPort: s.destPort,
 	}
 	switch s.protocol {
 	case "tcp":
-		m.protocol = protocolTCP
+		m.Protocol = protocolTCP
 	case "udp":
-		m.protocol = protocolUDP
+		m.Protocol = protocolUDP
 	default:
 		log.Fatalf("unknown protocol \"%s\" in service "+
 			"specification\n", s.protocol)

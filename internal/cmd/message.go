@@ -23,10 +23,10 @@ const (
 
 // message stores a control message
 type message struct {
-	op       uint8
-	protocol uint8
-	port     uint16
-	destPort uint16
+	Op       uint8
+	Protocol uint8
+	Port     uint16
+	DestPort uint16
 }
 
 // serialize writes message to a byte slice
