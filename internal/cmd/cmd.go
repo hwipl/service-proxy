@@ -61,7 +61,8 @@ func runClient() {
 	fmt.Printf("Starting client and connecting to server %s:%d\n",
 		cntrlAddr.IP, cntrlAddr.Port)
 
-	// not implemented
+	// connect to server and configure services
+	runControlClient(cntrlAddr, specs)
 }
 
 // parseCommandLine parses the command line arguments
