@@ -13,6 +13,25 @@ type serviceSpec struct {
 	destPort uint16
 }
 
+// toMessage converts a service specification to a message
+func (s *serviceSpec) toMessage() *message {
+	m := message{
+		op:       messageAdd,
+		port:     s.port,
+		destPort: s.destPort,
+	}
+	switch s.protocol {
+	case "tcp":
+		m.protocol = protocolTCP
+	case "udp":
+		m.protocol = protocolUDP
+	default:
+		log.Fatalf("unknown protocol \"%s\" in service "+
+			"specification\n", s.protocol)
+	}
+	return &m
+}
+
 // parseServiceSpec parses spec as a service specification with the format
 // "<protocol>:<port>:<destPort>"
 func parseServiceSpec(spec string) *serviceSpec {
