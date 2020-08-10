@@ -75,7 +75,11 @@ func (c *client) handleClient() {
 // stopClient stops active client services
 func (c *client) stopClient() {
 	for port := range c.tcpPorts {
-		tcpServices.get(port).stopService()
+		s := tcpServices.get(port)
+		fmt.Printf("Removing a tcp service for client %s: forward "+
+			"port %d to port %d\n", c.addr, s.srvAddr.Port,
+			s.dstAddr.Port)
+		s.stopService()
 		tcpServices.del(port)
 	}
 }
