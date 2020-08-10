@@ -48,8 +48,19 @@ func runClient() {
 	if cntrlAddr.Port == 0 {
 		cntrlAddr.Port = defaultPort
 	}
+
+	// treat remaining non-flag command line arguments as service
+	// specification strings with format "<protocol>:<port>:<destPort>"
+	if len(flag.Args()) == 0 {
+		log.Fatal("No services specified")
+	}
+	var specs []*serviceSpec
+	for _, arg := range flag.Args() {
+		specs = append(specs, parseServiceSpec(arg))
+	}
 	fmt.Printf("Starting client and connecting to server %s:%d\n",
 		cntrlAddr.IP, cntrlAddr.Port)
+
 	// not implemented
 }
 
