@@ -2,13 +2,19 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net"
 )
 
+const (
+	// defaultPort is the default port of the control server
+	defaultPort = 32323
+)
+
 var (
 	// serverAddr is the default listen address of the control server
-	serverAddr = ":32323"
+	serverAddr = fmt.Sprintf(":%d", defaultPort)
 	// clientAddr is the address of a control server the client connects to
 	clientAddr = ""
 )
