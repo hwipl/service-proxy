@@ -26,6 +26,12 @@ func runServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	ip := ""
+	if cntrlAddr.IP != nil {
+		ip = fmt.Sprintf("%s", cntrlAddr.IP)
+	}
+	fmt.Printf("Starting server and listening on %s:%d\n", ip,
+		cntrlAddr.Port)
 	runControl(cntrlAddr)
 }
 
@@ -42,6 +48,8 @@ func runClient() {
 	if cntrlAddr.Port == 0 {
 		cntrlAddr.Port = defaultPort
 	}
+	fmt.Printf("Starting client and connecting to server %s:%d\n",
+		cntrlAddr.IP, cntrlAddr.Port)
 	// not implemented
 }
 
