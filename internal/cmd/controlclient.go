@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net"
 )
@@ -20,6 +21,7 @@ func (c *controlClient) runClient() {
 		log.Fatal(err)
 	}
 	c.conn = conn
+	defer c.conn.Close()
 
 	// send service specs to server
 	for _, spec := range c.specs {
@@ -31,7 +33,11 @@ func (c *controlClient) runClient() {
 	buf := make([]byte, messageLen)
 	for {
 		// ignore messages from server for now
-		c.conn.Read(buf)
+		_, err := c.conn.Read(buf)
+		if err != nil {
+			fmt.Println("Closing connection to server:", err)
+			return
+		}
 	}
 }
 
