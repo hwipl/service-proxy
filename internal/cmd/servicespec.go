@@ -45,7 +45,7 @@ func parseServiceSpec(spec string) *serviceSpec {
 	protocol := parts[0]
 
 	// parse port
-	port, err := strconv.ParseInt(parts[1], 10, 16)
+	port, err := strconv.ParseUint(parts[1], 10, 16)
 	if err != nil {
 		log.Fatalf(errFmt, spec)
 	}
