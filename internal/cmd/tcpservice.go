@@ -53,8 +53,9 @@ func (t *tcpServiceMap) get(port int) *tcpService {
 type tcpService struct {
 	srvAddr  *net.TCPAddr
 	listener *net.TCPListener
-	done     bool
 	dstAddr  *net.TCPAddr
+	mutex    *sync.Mutex
+	done     bool
 }
 
 // runService runs the tcp service proxy
@@ -70,7 +71,7 @@ func (t *tcpService) runService() {
 		// get new service connection
 		srvConn, err := listener.Accept()
 		if err != nil {
-			if t.done {
+			if t.getDone() {
 				// service is shutting down, ignore errors
 				return
 			}
@@ -89,10 +90,26 @@ func (t *tcpService) runService() {
 	}
 }
 
+// setDone marks the service as done
+func (t *tcpService) setDone() {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	t.done = true
+}
+
+// getDone checks if the service is done
+func (t *tcpService) getDone() bool {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	return t.done
+}
+
 // stopService stops the tcp service proxy
 func (t *tcpService) stopService() {
 	// set service to done and close its listener
-	t.done = true
+	t.setDone()
 	t.listener.Close()
 	// this is pretty gracefully. active forwarder connections will remain
 	// open until they are done. also close active forwarders?
@@ -105,6 +122,7 @@ func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
 	srv := tcpService{
 		srvAddr: srvAddr,
 		dstAddr: dstAddr,
+		mutex:   &sync.Mutex{},
 	}
 
 	if tcpServices.add(srvAddr.Port, &srv) {
