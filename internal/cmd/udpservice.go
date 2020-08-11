@@ -90,7 +90,11 @@ func runUDPService(srvAddr, dstAddr *net.UDPAddr) *udpService {
 		dstAddr: dstAddr,
 	}
 
-	// run service
-	go srv.runService()
-	return &srv
+	if udpServices.add(srvAddr.Port, &srv) {
+		// run service
+		go srv.runService()
+		return &srv
+	}
+
+	return nil
 }
