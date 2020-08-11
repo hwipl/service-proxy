@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"net"
 )
@@ -11,6 +10,7 @@ type udpService struct {
 	srvAddr *net.UDPAddr
 	conn    *net.UDPConn
 	dstAddr *net.UDPAddr
+	fwds    *udpForwarderMap
 }
 
 // runService runs the udp service proxy
@@ -22,14 +22,18 @@ func (u *udpService) runService() {
 	}
 	defer conn.Close()
 	u.conn = conn
+	u.fwds = newUDPForwarderMap(u.conn, u.dstAddr)
 	for {
+		// read packet from socket
 		buf := make([]byte, 2048)
 		n, addr, err := conn.ReadFromUDP(buf)
 		if err != nil {
 			return
 		}
-		// not implemented
-		fmt.Println(n, addr)
+
+		// get forwarder for peer address and forward packet
+		fwd := u.fwds.get(addr)
+		fwd.forward(buf[:n])
 	}
 }
 
