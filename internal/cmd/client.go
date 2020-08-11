@@ -10,6 +10,7 @@ type client struct {
 	conn     net.Conn
 	addr     *net.TCPAddr
 	tcpPorts map[int]bool
+	udpPorts map[int]bool
 }
 
 // addTCPService adds a tcp service to the client
@@ -104,6 +105,7 @@ func handleClient(conn net.Conn) {
 		conn:     conn,
 		addr:     conn.RemoteAddr().(*net.TCPAddr),
 		tcpPorts: make(map[int]bool),
+		udpPorts: make(map[int]bool),
 	}
 	go c.handleClient()
 }
