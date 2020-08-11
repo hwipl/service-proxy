@@ -32,13 +32,32 @@ func (c *client) addTCPService(port, destPort int) {
 	}
 }
 
+// addUDPService adds an udp service to the client
+func (c *client) addUDPService(port, destPort int) {
+	fmt.Printf("Adding new udp service for client %s: forward port %d "+
+		"to port %d\n", c.addr, port, destPort)
+
+	// create udp addresses and start udp service
+	srvAddr := net.UDPAddr{
+		IP:   net.IPv4(0, 0, 0, 0),
+		Port: port,
+	}
+	dstAddr := net.UDPAddr{
+		IP:   c.addr.IP,
+		Port: destPort,
+	}
+	if runUDPService(&srvAddr, &dstAddr) != nil {
+		c.udpPorts[port] = true
+	}
+}
+
 // addService adds a service to the client
 func (c *client) addService(protocol uint8, port, destPort uint16) {
 	switch protocol {
 	case protocolTCP:
 		c.addTCPService(int(port), int(destPort))
 	case protocolUDP:
-		// not implemented
+		c.addUDPService(int(port), int(destPort))
 	default:
 		// unknown protocol, stop here
 		return
