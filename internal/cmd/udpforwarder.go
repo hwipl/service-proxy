@@ -5,6 +5,47 @@ import (
 	"net"
 )
 
+// udpForwarderMap maps peer addresses to forwarders
+type udpForwarderMap struct {
+	srvConn *net.UDPConn
+	dstAddr *net.UDPAddr
+	fwds    map[string]*udpForwarder
+}
+
+// get returns an udpForwarder for peer
+func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
+	fwd := u.fwds[peer.String()]
+	if fwd == nil {
+		// create a new forwarder for this peer
+		dstConn, err := net.DialUDP("udp", nil, u.dstAddr)
+		if err != nil {
+			fmt.Println("error creating socket for peer", peer)
+			return nil
+		}
+		newFwd := udpForwarder{
+			srvConn: u.srvConn,
+			dstConn: dstConn,
+			peer:    peer,
+		}
+		go newFwd.runForwarder()
+		return &newFwd
+	}
+
+	// re-use existing forwarder
+	return fwd
+}
+
+// newUDPForwarderMap creates a new udp forwarder for the udp service conn
+func newUDPForwarderMap(srvConn *net.UDPConn,
+	dstAddr *net.UDPAddr) *udpForwarderMap {
+	u := udpForwarderMap{
+		srvConn: srvConn,
+		dstAddr: dstAddr,
+		fwds:    make(map[string]*udpForwarder),
+	}
+	return &u
+}
+
 // udpForwarder forwards network traffic between a udp service proxy and
 // its destination
 type udpForwarder struct {
