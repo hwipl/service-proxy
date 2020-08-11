@@ -102,6 +102,14 @@ func (c *client) stopClient() {
 		s.stopService()
 		tcpServices.del(port)
 	}
+	for port := range c.udpPorts {
+		s := udpServices.get(port)
+		fmt.Printf("Removing a service for client %s: forward udp "+
+			"port %d to port %d\n", c.addr, s.srvAddr.Port,
+			s.dstAddr.Port)
+		s.stopService()
+		udpServices.del(port)
+	}
 }
 
 // readFromConn reads messageLen bytes from conn
