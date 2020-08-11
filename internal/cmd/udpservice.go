@@ -81,6 +81,12 @@ func (u *udpService) runService() {
 	}
 }
 
+// stopService stops the udp service proxy
+func (u *udpService) stopService() {
+	u.conn.Close()
+	u.fwds.stopAll()
+}
+
 // runUDPService runs an udp service proxy that listens on srvAddr and forwards
 // incomming packets to dstAddr
 func runUDPService(srvAddr, dstAddr *net.UDPAddr) *udpService {
