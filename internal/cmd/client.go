@@ -15,7 +15,7 @@ type client struct {
 
 // addTCPService adds a tcp service to the client
 func (c *client) addTCPService(port, destPort int) {
-	fmt.Printf("Adding new tcp service for client %s: forward port %d "+
+	fmt.Printf("Adding new service for client %s: forward tcp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
 	// create tcp addresses and start tcp service
@@ -34,7 +34,7 @@ func (c *client) addTCPService(port, destPort int) {
 
 // addUDPService adds an udp service to the client
 func (c *client) addUDPService(port, destPort int) {
-	fmt.Printf("Adding new udp service for client %s: forward port %d "+
+	fmt.Printf("Adding new service for client %s: forward udp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
 	// create udp addresses and start udp service
@@ -96,7 +96,7 @@ func (c *client) handleClient() {
 func (c *client) stopClient() {
 	for port := range c.tcpPorts {
 		s := tcpServices.get(port)
-		fmt.Printf("Removing a tcp service for client %s: forward "+
+		fmt.Printf("Removing a service for client %s: forward tcp "+
 			"port %d to port %d\n", c.addr, s.srvAddr.Port,
 			s.dstAddr.Port)
 		s.stopService()
