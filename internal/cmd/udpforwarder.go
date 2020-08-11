@@ -36,6 +36,15 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 	return fwd
 }
 
+// stopAll stops all udpForwarders in the map
+func (u *udpForwarderMap) stopAll() {
+	for peer, fwd := range u.fwds {
+		// close destination socket and remove element from map
+		fwd.dstConn.Close()
+		delete(u.fwds, peer)
+	}
+}
+
 // newUDPForwarderMap creates a new udp forwarder for the udp service conn
 func newUDPForwarderMap(srvConn *net.UDPConn,
 	dstAddr *net.UDPAddr) *udpForwarderMap {
