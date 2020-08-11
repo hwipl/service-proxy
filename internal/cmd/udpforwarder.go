@@ -1,6 +1,9 @@
 package cmd
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 // udpForwarder forwards network traffic between a udp service proxy and
 // its destination
@@ -25,5 +28,14 @@ func (u *udpForwarder) runForwarder() {
 		if err != nil {
 			return
 		}
+	}
+}
+
+// forward forwards a packet from the service peer to the proxy destination
+func (u *udpForwarder) forward(b []byte) {
+	_, err := u.dstConn.Write(b)
+	if err != nil {
+		fmt.Printf("error sending packet from %s to %s\n", u.peer,
+			u.dstConn.RemoteAddr())
 	}
 }
