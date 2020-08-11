@@ -27,6 +27,7 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 			dstConn: dstConn,
 			peer:    peer,
 		}
+		u.fwds[peer.String()] = &newFwd
 		go newFwd.runForwarder()
 		return &newFwd
 	}
