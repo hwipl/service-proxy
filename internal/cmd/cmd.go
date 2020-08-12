@@ -56,7 +56,11 @@ func runServer() {
 
 // run in client mode
 func runClient() {
+	ip := ""
 	cntrlAddr := parseTCPAddr(clientAddr)
+	if cntrlAddr.IP != nil {
+		ip = fmt.Sprintf("%s", cntrlAddr.IP)
+	}
 	if cntrlAddr.Port == 0 {
 		cntrlAddr.Port = defaultPort
 	}
@@ -71,7 +75,7 @@ func runClient() {
 		specs = append(specs, parseServiceSpec(arg))
 	}
 	log.Printf("Starting client and connecting to server %s:%d\n",
-		cntrlAddr.IP, cntrlAddr.Port)
+		ip, cntrlAddr.Port)
 
 	// connect to server and configure services
 	runControlClient(cntrlAddr, specs)
