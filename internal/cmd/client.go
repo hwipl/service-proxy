@@ -20,7 +20,7 @@ func (c *client) addTCPService(port, destPort int) {
 
 	// create tcp addresses and start tcp service
 	srvAddr := net.TCPAddr{
-		IP:   net.IPv4(0, 0, 0, 0),
+		IP:   serverIP,
 		Port: port,
 	}
 	dstAddr := net.TCPAddr{
@@ -39,7 +39,7 @@ func (c *client) addUDPService(port, destPort int) {
 
 	// create udp addresses and start udp service
 	srvAddr := net.UDPAddr{
-		IP:   net.IPv4(0, 0, 0, 0),
+		IP:   serverIP,
 		Port: port,
 	}
 	dstAddr := net.UDPAddr{
