@@ -51,10 +51,19 @@ func runServer() {
 
 // run in client mode
 func runClient() {
-	// parse client address
+	// parse client address, check if it's a valid tcp address
 	cntrlAddr, err := net.ResolveTCPAddr("tcp", clientAddr)
 	if err != nil {
-		log.Fatal(err)
+		// it's not a valid tcp address, check if it's an ip address
+		cntrlIP, err := net.ResolveIPAddr("ip", clientAddr)
+		if err != nil {
+			log.Fatal("cannot parse server address: ", clientAddr)
+		}
+		cntrlAddr = &net.TCPAddr{
+			IP:   cntrlIP.IP,
+			Port: defaultPort,
+			Zone: cntrlIP.Zone,
+		}
 	}
 	if cntrlAddr.IP == nil {
 		log.Fatal("Invalid address to connect to as client")
