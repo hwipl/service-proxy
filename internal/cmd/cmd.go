@@ -57,9 +57,6 @@ func runServer() {
 // run in client mode
 func runClient() {
 	cntrlAddr := parseTCPAddr(clientAddr)
-	if cntrlAddr.IP == nil {
-		log.Fatal("Invalid address to connect to as client")
-	}
 	if cntrlAddr.Port == 0 {
 		cntrlAddr.Port = defaultPort
 	}
