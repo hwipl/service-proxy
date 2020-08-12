@@ -3,11 +3,13 @@ package cmd
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 )
 
 // udpForwarderMap maps peer addresses to forwarders
 type udpForwarderMap struct {
+	mutex   sync.Mutex
 	srvConn *net.UDPConn
 	dstAddr *net.UDPAddr
 	fwds    map[string]*udpForwarder
@@ -15,6 +17,9 @@ type udpForwarderMap struct {
 
 // get returns an udpForwarder for peer
 func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
 	fwd := u.fwds[peer.String()]
 	if fwd == nil {
 		// create a new forwarder for this peer
@@ -41,6 +46,9 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 
 // stopAll stops all udpForwarders in the map
 func (u *udpForwarderMap) stopAll() {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
 	for peer, fwd := range u.fwds {
 		// close destination socket and remove element from map
 		fwd.dstConn.Close()
