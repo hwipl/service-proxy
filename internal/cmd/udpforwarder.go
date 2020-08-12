@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 // udpForwarderMap maps peer addresses to forwarders
@@ -75,7 +76,13 @@ func (u *udpForwarder) runForwarder() {
 	// read data from destination conn to channel
 	go udpReadToChannel(u.dstConn, u.dstData)
 
+	// create ticker for detecting dead connection
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+
 	// start forwarding traffic
+	last := -1
+	pkts := 0
 	for {
 		select {
 		case data, more := <-u.srvData:
@@ -91,6 +98,7 @@ func (u *udpForwarder) runForwarder() {
 					u.dstConn.RemoteAddr())
 				return
 			}
+			pkts++
 		case data, more := <-u.dstData:
 			if !more {
 				// no more data from destination connection,
@@ -104,6 +112,17 @@ func (u *udpForwarder) runForwarder() {
 					u.peer)
 				return
 			}
+			pkts++
+		case <-ticker.C:
+			if last == pkts {
+				// no packets forwarded since last timer tick,
+				// assume connection is dead and stop here
+				fmt.Printf("Cleaning up udp forwarder "+
+					"between peer %s and %s\n", u.peer,
+					u.dstConn.RemoteAddr())
+				return
+			}
+			last = pkts
 		}
 	}
 }
