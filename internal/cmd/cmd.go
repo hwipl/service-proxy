@@ -24,10 +24,19 @@ var (
 
 // run in server mode
 func runServer() {
-	// parse server address
+	// parse server address, check if it's a valid tcp address
 	cntrlAddr, err := net.ResolveTCPAddr("tcp", serverAddr)
 	if err != nil {
-		log.Fatal(err)
+		// it's not a valid tcp address, check if it's an ip address
+		cntrlIP, err := net.ResolveIPAddr("ip", serverAddr)
+		if err != nil {
+			log.Fatal("cannot parse server address: ", serverAddr)
+		}
+		cntrlAddr = &net.TCPAddr{
+			IP:   cntrlIP.IP,
+			Port: defaultPort,
+			Zone: cntrlIP.Zone,
+		}
 	}
 	ip := ""
 	if cntrlAddr.IP != nil {
