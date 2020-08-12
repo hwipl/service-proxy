@@ -26,6 +26,8 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 			srvConn: u.srvConn,
 			dstConn: dstConn,
 			peer:    peer,
+			srvData: make(chan []byte),
+			dstData: make(chan []byte),
 		}
 		u.fwds[peer.String()] = &newFwd
 		go newFwd.runForwarder()
@@ -62,31 +64,65 @@ type udpForwarder struct {
 	srvConn *net.UDPConn
 	dstConn *net.UDPConn
 	peer    *net.UDPAddr
+	srvData chan []byte
+	dstData chan []byte
 }
 
 // runForwarder runs the udp forwarder
 func (u *udpForwarder) runForwarder() {
 	defer u.dstConn.Close()
+
+	// read data from destination conn to channel
+	go udpReadToChannel(u.dstConn, u.dstData)
+
+	// start forwarding traffic
 	for {
-		// read packets from proxy destination and send them to the
-		// service peer
-		buf := make([]byte, 2048)
-		n, err := u.dstConn.Read(buf)
-		if err != nil {
-			return
-		}
-		_, err = u.srvConn.WriteToUDP(buf[:n], u.peer)
-		if err != nil {
-			return
+		select {
+		case data, more := <-u.srvData:
+			if !more {
+				// no more data from service connection,
+				// close destination connection and stop
+				return
+			}
+			_, err := u.dstConn.Write(data)
+			if err != nil {
+				fmt.Printf("error sending packet from %s "+
+					"to %s\n", u.peer,
+					u.dstConn.RemoteAddr())
+				return
+			}
+		case data, more := <-u.dstData:
+			if !more {
+				// no more data from destination connection,
+				// stop here
+				return
+			}
+			_, err := u.srvConn.WriteToUDP(data, u.peer)
+			if err != nil {
+				fmt.Printf("error sending packet from %s "+
+					"to %s\n", u.dstConn.RemoteAddr(),
+					u.peer)
+				return
+			}
 		}
 	}
 }
 
 // forward forwards a packet from the service peer to the proxy destination
 func (u *udpForwarder) forward(b []byte) {
-	_, err := u.dstConn.Write(b)
-	if err != nil {
-		fmt.Printf("error sending packet from %s to %s\n", u.peer,
-			u.dstConn.RemoteAddr())
+	u.srvData <- b
+}
+
+// udpReadToChannel reads data from conn and writes it to channel
+// TODO: use/merge with tcpReadToChannel?
+func udpReadToChannel(conn net.Conn, channel chan<- []byte) {
+	for {
+		buf := make([]byte, 2048)
+		n, err := conn.Read(buf)
+		if err != nil {
+			close(channel)
+			return
+		}
+		channel <- buf[:n]
 	}
 }
