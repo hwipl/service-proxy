@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"net"
 )
@@ -35,7 +34,7 @@ func (c *controlClient) runClient() {
 		// ignore messages from server for now
 		_, err := c.conn.Read(buf)
 		if err != nil {
-			fmt.Println("Closing connection to server:", err)
+			log.Println("Closing connection to server:", err)
 			return
 		}
 	}

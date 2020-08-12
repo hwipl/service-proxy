@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"net"
 )
 
@@ -15,7 +15,7 @@ type client struct {
 
 // addTCPService adds a tcp service to the client
 func (c *client) addTCPService(port, destPort int) {
-	fmt.Printf("Adding new service for client %s: forward tcp port %d "+
+	log.Printf("Adding new service for client %s: forward tcp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
 	// create tcp addresses and start tcp service
@@ -34,7 +34,7 @@ func (c *client) addTCPService(port, destPort int) {
 
 // addUDPService adds an udp service to the client
 func (c *client) addUDPService(port, destPort int) {
-	fmt.Printf("Adding new service for client %s: forward udp port %d "+
+	log.Printf("Adding new service for client %s: forward udp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
 	// create udp addresses and start udp service
@@ -68,13 +68,13 @@ func (c *client) addService(protocol uint8, port, destPort uint16) {
 func (c *client) handleClient() {
 	defer c.conn.Close()
 	defer c.stopClient()
-	fmt.Println("New connection from client", c.addr)
+	log.Println("New connection from client", c.addr)
 	for {
 		// read a message from the connection and parse it
 		var msg message
 		buf := readFromConn(c.conn)
 		if buf == nil {
-			fmt.Println("Closing connection to client", c.addr)
+			log.Println("Closing connection to client", c.addr)
 			return
 		}
 		msg.parse(buf)
@@ -96,7 +96,7 @@ func (c *client) handleClient() {
 func (c *client) stopClient() {
 	for port := range c.tcpPorts {
 		s := tcpServices.get(port)
-		fmt.Printf("Removing a service for client %s: forward tcp "+
+		log.Printf("Removing a service for client %s: forward tcp "+
 			"port %d to port %d\n", c.addr, s.srvAddr.Port,
 			s.dstAddr.Port)
 		s.stopService()
@@ -104,7 +104,7 @@ func (c *client) stopClient() {
 	}
 	for port := range c.udpPorts {
 		s := udpServices.get(port)
-		fmt.Printf("Removing a service for client %s: forward udp "+
+		log.Printf("Removing a service for client %s: forward udp "+
 			"port %d to port %d\n", c.addr, s.srvAddr.Port,
 			s.dstAddr.Port)
 		s.stopService()

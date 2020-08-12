@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -25,7 +25,7 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 		// create a new forwarder for this peer
 		dstConn, err := net.DialUDP("udp", nil, u.dstAddr)
 		if err != nil {
-			fmt.Println("error creating socket for peer", peer)
+			log.Println("error creating socket for peer", peer)
 			return nil
 		}
 		newFwd := udpForwarder{
@@ -112,7 +112,7 @@ func (u *udpForwarder) runForwarder() {
 			}
 			_, err := u.dstConn.Write(data)
 			if err != nil {
-				fmt.Printf("error sending packet from %s "+
+				log.Printf("error sending packet from %s "+
 					"to %s\n", u.peer,
 					u.dstConn.RemoteAddr())
 				return
@@ -126,7 +126,7 @@ func (u *udpForwarder) runForwarder() {
 			}
 			_, err := u.srvConn.WriteToUDP(data, u.peer)
 			if err != nil {
-				fmt.Printf("error sending packet from %s "+
+				log.Printf("error sending packet from %s "+
 					"to %s\n", u.dstConn.RemoteAddr(),
 					u.peer)
 				return
@@ -136,7 +136,7 @@ func (u *udpForwarder) runForwarder() {
 			if last == pkts {
 				// no packets forwarded since last timer tick,
 				// assume connection is dead and stop here
-				fmt.Printf("Cleaning up udp forwarder "+
+				log.Printf("Cleaning up udp forwarder "+
 					"between peer %s and %s\n", u.peer,
 					u.dstConn.RemoteAddr())
 				return

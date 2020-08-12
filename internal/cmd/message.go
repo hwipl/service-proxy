@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"log"
 )
 
@@ -44,6 +43,6 @@ func (m *message) parse(b []byte) {
 	buf := bytes.NewBuffer(b)
 	err := binary.Read(buf, binary.BigEndian, m)
 	if err != nil {
-		fmt.Println("error reading message:", err)
+		log.Println("error reading message:", err)
 	}
 }

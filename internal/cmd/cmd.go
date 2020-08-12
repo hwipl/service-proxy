@@ -35,7 +35,7 @@ func runServer() {
 		serverIP = cntrlAddr.IP
 		ip = fmt.Sprintf("%s", cntrlAddr.IP)
 	}
-	fmt.Printf("Starting server and listening on %s:%d\n", ip,
+	log.Printf("Starting server and listening on %s:%d\n", ip,
 		cntrlAddr.Port)
 	runControl(cntrlAddr)
 }
@@ -63,7 +63,7 @@ func runClient() {
 	for _, arg := range flag.Args() {
 		specs = append(specs, parseServiceSpec(arg))
 	}
-	fmt.Printf("Starting client and connecting to server %s:%d\n",
+	log.Printf("Starting client and connecting to server %s:%d\n",
 		cntrlAddr.IP, cntrlAddr.Port)
 
 	// connect to server and configure services
