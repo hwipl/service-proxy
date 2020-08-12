@@ -29,6 +29,7 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 			return nil
 		}
 		newFwd := udpForwarder{
+			fwdMap:  u,
 			srvConn: u.srvConn,
 			dstConn: dstConn,
 			peer:    peer,
@@ -78,6 +79,7 @@ func newUDPForwarderMap(srvConn *net.UDPConn,
 // udpForwarder forwards network traffic between a udp service proxy and
 // its destination
 type udpForwarder struct {
+	fwdMap  *udpForwarderMap
 	srvConn *net.UDPConn
 	dstConn *net.UDPConn
 	peer    *net.UDPAddr
@@ -88,6 +90,7 @@ type udpForwarder struct {
 // runForwarder runs the udp forwarder
 func (u *udpForwarder) runForwarder() {
 	defer u.dstConn.Close()
+	defer u.fwdMap.del(u.peer)
 
 	// read data from destination conn to channel
 	go udpReadToChannel(u.dstConn, u.dstData)
