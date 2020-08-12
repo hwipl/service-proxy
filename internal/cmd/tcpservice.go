@@ -60,16 +60,10 @@ type tcpService struct {
 
 // runService runs the tcp service proxy
 func (t *tcpService) runService() {
-	// start service socket
-	listener, err := net.ListenTCP("tcp", t.srvAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer listener.Close()
-	t.listener = listener
+	defer t.listener.Close()
 	for {
 		// get new service connection
-		srvConn, err := listener.Accept()
+		srvConn, err := t.listener.Accept()
 		if err != nil {
 			if t.getDone() {
 				// service is shutting down, ignore errors
@@ -119,10 +113,15 @@ func (t *tcpService) stopService() {
 // incoming connections to dstAddr
 func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
 	// create service
+	listener, err := net.ListenTCP("tcp", srvAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
 	srv := tcpService{
-		srvAddr: srvAddr,
-		dstAddr: dstAddr,
-		mutex:   &sync.Mutex{},
+		srvAddr:  srvAddr,
+		dstAddr:  dstAddr,
+		listener: listener,
+		mutex:    &sync.Mutex{},
 	}
 
 	if tcpServices.add(srvAddr.Port, &srv) {
