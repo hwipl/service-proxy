@@ -44,6 +44,14 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 	return fwd
 }
 
+// del removes the udpForwarder for peer
+func (u *udpForwarderMap) del(peer *net.UDPAddr) {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	delete(u.fwds, peer.String())
+}
+
 // stopAll stops all udpForwarders in the map
 func (u *udpForwarderMap) stopAll() {
 	u.mutex.Lock()
