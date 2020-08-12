@@ -22,15 +22,14 @@ var (
 	clientAddr = ""
 )
 
-// run in server mode
-func runServer() {
+func parseTCPAddr(addr string) *net.TCPAddr {
 	// parse server address, check if it's a valid tcp address
-	cntrlAddr, err := net.ResolveTCPAddr("tcp", serverAddr)
+	cntrlAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		// it's not a valid tcp address, check if it's an ip address
-		cntrlIP, err := net.ResolveIPAddr("ip", serverAddr)
+		cntrlIP, err := net.ResolveIPAddr("ip", addr)
 		if err != nil {
-			log.Fatal("cannot parse server address: ", serverAddr)
+			log.Fatal("cannot parse server address: ", addr)
 		}
 		cntrlAddr = &net.TCPAddr{
 			IP:   cntrlIP.IP,
@@ -38,7 +37,13 @@ func runServer() {
 			Zone: cntrlIP.Zone,
 		}
 	}
+	return cntrlAddr
+}
+
+// run in server mode
+func runServer() {
 	ip := ""
+	cntrlAddr := parseTCPAddr(serverAddr)
 	if cntrlAddr.IP != nil {
 		// user supplied an ip address, update serverIP with it
 		serverIP = cntrlAddr.IP
@@ -51,20 +56,7 @@ func runServer() {
 
 // run in client mode
 func runClient() {
-	// parse client address, check if it's a valid tcp address
-	cntrlAddr, err := net.ResolveTCPAddr("tcp", clientAddr)
-	if err != nil {
-		// it's not a valid tcp address, check if it's an ip address
-		cntrlIP, err := net.ResolveIPAddr("ip", clientAddr)
-		if err != nil {
-			log.Fatal("cannot parse server address: ", clientAddr)
-		}
-		cntrlAddr = &net.TCPAddr{
-			IP:   cntrlIP.IP,
-			Port: defaultPort,
-			Zone: cntrlIP.Zone,
-		}
-	}
+	cntrlAddr := parseTCPAddr(clientAddr)
 	if cntrlAddr.IP == nil {
 		log.Fatal("Invalid address to connect to as client")
 	}
