@@ -53,6 +53,7 @@ func (t *tcpServiceMap) get(port int) *tcpService {
 type tcpService struct {
 	srvAddr  *net.TCPAddr
 	listener *net.TCPListener
+	srcAddr  *net.TCPAddr
 	dstAddr  *net.TCPAddr
 	mutex    *sync.Mutex
 	done     bool
@@ -73,7 +74,7 @@ func (t *tcpService) runService() {
 		}
 
 		// open connection to proxy destination
-		dstConn, err := net.DialTCP("tcp", nil, t.dstAddr)
+		dstConn, err := net.DialTCP("tcp", t.srcAddr, t.dstAddr)
 		if err != nil {
 			srvConn.Close()
 			continue
@@ -110,8 +111,8 @@ func (t *tcpService) stopService() {
 }
 
 // runTCPService runs a tcp service proxy that listens on srvAddr and forwards
-// incoming connections to dstAddr
-func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
+// incoming connections to dstAddr from srcAddr
+func runTCPService(srvAddr, srcAddr, dstAddr *net.TCPAddr) *tcpService {
 	// create service
 	listener, err := net.ListenTCP("tcp", srvAddr)
 	if err != nil {
@@ -119,6 +120,7 @@ func runTCPService(srvAddr, dstAddr *net.TCPAddr) *tcpService {
 	}
 	srv := tcpService{
 		srvAddr:  srvAddr,
+		srcAddr:  srcAddr,
 		dstAddr:  dstAddr,
 		listener: listener,
 		mutex:    &sync.Mutex{},

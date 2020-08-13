@@ -9,6 +9,7 @@ import (
 type client struct {
 	conn     net.Conn
 	addr     *net.TCPAddr
+	laddr    *net.TCPAddr
 	tcpPorts map[int]bool
 	udpPorts map[int]bool
 }
@@ -23,11 +24,14 @@ func (c *client) addTCPService(port, destPort int) {
 		IP:   serverIP,
 		Port: port,
 	}
+	srcAddr := net.TCPAddr{
+		IP: c.laddr.IP,
+	}
 	dstAddr := net.TCPAddr{
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
-	if runTCPService(&srvAddr, &dstAddr) != nil {
+	if runTCPService(&srvAddr, &srcAddr, &dstAddr) != nil {
 		c.tcpPorts[port] = true
 	}
 }
@@ -131,6 +135,7 @@ func handleClient(conn net.Conn) {
 	c := client{
 		conn:     conn,
 		addr:     conn.RemoteAddr().(*net.TCPAddr),
+		laddr:    conn.LocalAddr().(*net.TCPAddr),
 		tcpPorts: make(map[int]bool),
 		udpPorts: make(map[int]bool),
 	}
