@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 )
 
 const (
@@ -81,13 +82,27 @@ func runClient() {
 	runControlClient(cntrlAddr, specs)
 }
 
+// showUsage shows the program usage. It is a workaround for showing multiple
+// arguments required by the -c flag
+func showUsage() {
+	cmd := os.Args[0]
+	out := flag.CommandLine.Output()
+	fmt.Fprintf(out, "Usage of %s:", cmd)
+	fmt.Fprintf(out, "\n  -c address services")
+	fmt.Fprintf(out, "\n    \tstart client, connect to address and "+
+		"register services,\n    \te.g., tcp:8000:80 udp:53000:53000")
+	fmt.Fprintf(out, "\n  -s address")
+	fmt.Fprintf(out, "\n    \tstart server (default) and listen on "+
+		"address")
+	fmt.Fprintf(out, "\n")
+}
+
 // parseCommandLine parses the command line arguments
 func parseCommandLine() {
 	// set command line arguments
-	flag.StringVar(&serverAddr, "s", serverAddr,
-		"start server (default) and listen on `address`")
-	flag.StringVar(&clientAddr, "c", clientAddr,
-		"start client and connect to `address`")
+	flag.StringVar(&serverAddr, "s", serverAddr, "")
+	flag.StringVar(&clientAddr, "c", clientAddr, "")
+	flag.Usage = showUsage
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
