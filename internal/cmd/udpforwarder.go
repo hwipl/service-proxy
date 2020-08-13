@@ -11,6 +11,7 @@ import (
 type udpForwarderMap struct {
 	mutex   sync.Mutex
 	srvConn *net.UDPConn
+	srcAddr *net.UDPAddr
 	dstAddr *net.UDPAddr
 	fwds    map[string]*udpForwarder
 }
@@ -23,7 +24,7 @@ func (u *udpForwarderMap) get(peer *net.UDPAddr) *udpForwarder {
 	fwd := u.fwds[peer.String()]
 	if fwd == nil {
 		// create a new forwarder for this peer
-		dstConn, err := net.DialUDP("udp", nil, u.dstAddr)
+		dstConn, err := net.DialUDP("udp", u.srcAddr, u.dstAddr)
 		if err != nil {
 			log.Println("error creating socket for peer", peer)
 			return nil
@@ -67,9 +68,10 @@ func (u *udpForwarderMap) stopAll() {
 
 // newUDPForwarderMap creates a new udp forwarder for the udp service conn
 func newUDPForwarderMap(srvConn *net.UDPConn,
-	dstAddr *net.UDPAddr) *udpForwarderMap {
+	srcAddr, dstAddr *net.UDPAddr) *udpForwarderMap {
 	u := udpForwarderMap{
 		srvConn: srvConn,
+		srcAddr: srcAddr,
 		dstAddr: dstAddr,
 		fwds:    make(map[string]*udpForwarder),
 	}

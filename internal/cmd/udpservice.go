@@ -53,6 +53,7 @@ func (u *udpServiceMap) get(port int) *udpService {
 type udpService struct {
 	srvAddr *net.UDPAddr
 	conn    *net.UDPConn
+	srcAddr *net.UDPAddr
 	dstAddr *net.UDPAddr
 	fwds    *udpForwarderMap
 }
@@ -60,7 +61,7 @@ type udpService struct {
 // runService runs the udp service proxy
 func (u *udpService) runService() {
 	defer u.conn.Close()
-	u.fwds = newUDPForwarderMap(u.conn, u.dstAddr)
+	u.fwds = newUDPForwarderMap(u.conn, u.srcAddr, u.dstAddr)
 	for {
 		// read packet from socket
 		buf := make([]byte, 2048)
@@ -83,7 +84,7 @@ func (u *udpService) stopService() {
 
 // runUDPService runs an udp service proxy that listens on srvAddr and forwards
 // incomming packets to dstAddr
-func runUDPService(srvAddr, dstAddr *net.UDPAddr) *udpService {
+func runUDPService(srvAddr, srcAddr, dstAddr *net.UDPAddr) *udpService {
 	// create service
 	conn, err := net.ListenUDP("udp", srvAddr)
 	if err != nil {
@@ -91,6 +92,7 @@ func runUDPService(srvAddr, dstAddr *net.UDPAddr) *udpService {
 	}
 	srv := udpService{
 		srvAddr: srvAddr,
+		srcAddr: srcAddr,
 		dstAddr: dstAddr,
 		conn:    conn,
 	}

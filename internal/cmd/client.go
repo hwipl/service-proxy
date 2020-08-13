@@ -46,11 +46,14 @@ func (c *client) addUDPService(port, destPort int) {
 		IP:   serverIP,
 		Port: port,
 	}
+	srcAddr := net.UDPAddr{
+		IP: c.laddr.IP,
+	}
 	dstAddr := net.UDPAddr{
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
-	if runUDPService(&srvAddr, &dstAddr) != nil {
+	if runUDPService(&srvAddr, &srcAddr, &dstAddr) != nil {
 		c.udpPorts[port] = true
 	}
 }
