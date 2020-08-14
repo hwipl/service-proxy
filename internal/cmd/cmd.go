@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
+	"strings"
 )
 
 const (
@@ -21,6 +21,9 @@ var (
 	serverIP net.IP
 	// clientAddr is the address of a control server the client connects to
 	clientAddr = ""
+	// registerServices is a comma-separated list of services to register
+	// on the server
+	registerServices = ""
 )
 
 func parseTCPAddr(addr string) *net.TCPAddr {
@@ -66,14 +69,15 @@ func runClient() {
 		cntrlAddr.Port = defaultPort
 	}
 
-	// treat remaining non-flag command line arguments as service
-	// specification strings with format "<protocol>:<port>:<destPort>"
-	if len(flag.Args()) == 0 {
+	// parse service specifications in registerServices (format
+	// "<protocol>:<port>:<destPort>")
+	if registerServices == "" {
 		log.Fatal("No services specified")
 	}
+	services := strings.Split(registerServices, ",")
 	var specs []*serviceSpec
-	for _, arg := range flag.Args() {
-		specs = append(specs, parseServiceSpec(arg))
+	for _, s := range services {
+		specs = append(specs, parseServiceSpec(s))
 	}
 	log.Printf("Starting client and connecting to server %s:%d\n",
 		ip, cntrlAddr.Port)
@@ -82,27 +86,16 @@ func runClient() {
 	runControlClient(cntrlAddr, specs)
 }
 
-// showUsage shows the program usage. It is a workaround for showing multiple
-// arguments required by the -c flag
-func showUsage() {
-	cmd := os.Args[0]
-	out := flag.CommandLine.Output()
-	fmt.Fprintf(out, "Usage of %s:", cmd)
-	fmt.Fprintf(out, "\n  -c address services")
-	fmt.Fprintf(out, "\n    \tstart client, connect to address and "+
-		"register services,\n    \te.g., tcp:8000:80 udp:53000:53000")
-	fmt.Fprintf(out, "\n  -s address")
-	fmt.Fprintf(out, "\n    \tstart server (default) and listen on "+
-		"address")
-	fmt.Fprintf(out, "\n")
-}
-
 // parseCommandLine parses the command line arguments
 func parseCommandLine() {
 	// set command line arguments
-	flag.StringVar(&serverAddr, "s", serverAddr, "")
-	flag.StringVar(&clientAddr, "c", clientAddr, "")
-	flag.Usage = showUsage
+	flag.StringVar(&serverAddr, "s", serverAddr,
+		"start server (default) and listen on `address`")
+	flag.StringVar(&clientAddr, "c", clientAddr,
+		"start client and connect to `address`; requires -r")
+	flag.StringVar(&registerServices, "r", registerServices,
+		"register comma-separated list of `services` on server,\n"+
+			"e.g., tcp:8000:80,udp:53000:53000")
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
