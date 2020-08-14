@@ -60,6 +60,12 @@ func (c *client) addUDPService(port, destPort int) {
 
 // addService adds a service to the client
 func (c *client) addService(protocol uint8, port, destPort uint16) {
+	// check if port is allowed
+	if !allowedPortRanges.containsPort(protocol, port) {
+		return
+	}
+
+	// start service
 	switch protocol {
 	case protocolTCP:
 		c.addTCPService(int(port), int(destPort))
