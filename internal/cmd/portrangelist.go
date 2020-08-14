@@ -35,6 +35,31 @@ func (p *portRangeList) add(protocol uint8, min, max uint16) {
 		min:      min,
 		max:      max,
 	}
+
+	// check if there is an existing entry that contains the new port
+	// range, or if existing port range entries should be replaced by
+	// the new one
+	k := 0
+	for _, existing := range p.l {
+		if existing.contains(&r) {
+			// existing entry already contains new one, stop here
+			return
+		}
+		if r.contains(existing) {
+			// new entry contains existing one, remove existing
+			// entry and add new one later
+			continue
+		}
+
+		// keep entry in list
+		p.l[k] = existing
+		k++
+
+	}
+	// update list with remaining entries
+	p.l = p.l[:k]
+
+	// new entry, add it
 	p.l = append(p.l, &r)
 }
 
