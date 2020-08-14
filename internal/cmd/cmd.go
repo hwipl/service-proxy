@@ -28,6 +28,9 @@ var (
 	// allowedIPs is a comma-separated list of all IPs allowed to connect
 	// to the server
 	allowedIPs = "0.0.0.0/0"
+	// allowedPorts is a comma-separated list of protocol and port (range)
+	// pairs, that are allowed as services on the server
+	allowedPorts = "udp:1024-65535,tcp:1024-65535"
 )
 
 func parseTCPAddr(addr string) *net.TCPAddr {
@@ -130,6 +133,16 @@ func runServer() {
 			parseAllowedIP(a)
 		}
 	}
+
+	// parse allowed ports
+	if allowedPorts != "" {
+		aPorts := strings.Split(allowedPorts, ",")
+		for _, a := range aPorts {
+			parseAllowedPort(a)
+		}
+	}
+
+	// output info and start server
 	log.Printf("Starting server and listening on %s:%d\n", ip,
 		cntrlAddr.Port)
 	for _, ipNet := range allowedIPNets.getAll() {
@@ -180,6 +193,10 @@ func parseCommandLine() {
 		"set comma-separated list of `IPs` the server accepts\n"+
 			"service registrations from, e.g.:\n"+
 			"127.0.0.1,192.168.1.0/24")
+	flag.StringVar(&allowedPorts, "allowed-ports", allowedPorts,
+		"set comma-separated list of `ports` the server accepts\n"+
+			"in service registrations, e.g.:\n"+
+			"udp:2048-65000,tcp:8000")
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
