@@ -112,3 +112,8 @@ func (p *portRangeList) containsPort(protocol uint8, port uint16) bool {
 	}
 	return false
 }
+
+// getAll returns a list of all port ranges
+func (p *portRangeList) getAll() []*portRange {
+	return p.l
+}
