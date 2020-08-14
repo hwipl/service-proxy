@@ -18,6 +18,20 @@ func (p *portRange) contains(other *portRange) bool {
 		p.max >= other.max
 }
 
+// merge combines this port range with the other port range if they overlap
+func (p *portRange) merge(other *portRange) {
+	if p.protocol != other.protocol {
+		return
+	}
+
+	if other.min <= p.min && other.max >= p.min {
+		p.min = other.min
+	}
+	if other.max >= p.max && other.min <= p.max {
+		p.max = other.max
+	}
+}
+
 // containsPort returns if protocol and port are in the port range
 func (p *portRange) containsPort(protocol uint8, port uint16) bool {
 	return protocol == p.protocol && port >= p.min && port <= p.max
