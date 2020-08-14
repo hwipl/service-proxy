@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -67,6 +68,49 @@ func parseAllowedIP(addr string) {
 		}
 	}
 	allowedIPNets.add(ipNet)
+}
+
+func parseAllowedPort(port string) {
+	// get protocol and port range
+	protPorts := strings.Split(port, ":")
+	if len(protPorts) != 2 {
+		log.Fatal("cannot parse allowed port: ", port)
+	}
+
+	// parse protocol
+	protocol := uint8(0)
+	switch protPorts[0] {
+	case "tcp":
+		protocol = protocolTCP
+	case "udp":
+		protocol = protocolUDP
+	default:
+		log.Fatal("unknown protocol in allowed port: ", port)
+	}
+
+	// get min and max port from port range
+	minmax := strings.Split(protPorts[1], "-")
+	if len(minmax) < 1 || len(minmax) > 2 {
+		log.Fatal("cannot parse allowed port: ", port)
+	}
+	min, err := strconv.ParseUint(minmax[0], 10, 16)
+	if err != nil {
+		log.Fatal(err)
+	}
+	getMax := func() string {
+		if len(minmax) == 2 {
+			return minmax[1]
+		} else {
+			return minmax[0]
+		}
+	}
+	max, err := strconv.ParseUint(getMax(), 10, 16)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// add port range to allowed port ranges
+	allowedPortRanges.add(protocol, uint16(min), uint16(max))
 }
 
 // run in server mode
