@@ -1,5 +1,9 @@
 package cmd
 
+var (
+	allowedPortRanges portRangeList
+)
+
 // portRange specifies a port range for a specific protocol
 type portRange struct {
 	protocol int
