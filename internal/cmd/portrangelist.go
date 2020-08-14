@@ -11,6 +11,13 @@ type portRange struct {
 	max      uint16
 }
 
+// contains checks if this port range contains the other port range
+func (p *portRange) contains(other *portRange) bool {
+	return p.protocol == other.protocol &&
+		p.min <= other.min &&
+		p.max >= other.max
+}
+
 // containsPort returns if protocol and port are in the port range
 func (p *portRange) containsPort(protocol uint8, port uint16) bool {
 	return protocol == p.protocol && port >= p.min && port <= p.max
