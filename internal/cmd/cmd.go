@@ -111,6 +111,9 @@ func parseAllowedPort(port string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if min > max {
+		min, max = max, min
+	}
 
 	// add port range to allowed port ranges
 	allowedPortRanges.add(protocol, uint16(min), uint16(max))
