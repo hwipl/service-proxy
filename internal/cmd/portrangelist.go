@@ -6,13 +6,13 @@ var (
 
 // portRange specifies a port range for a specific protocol
 type portRange struct {
-	protocol int
-	min      int
-	max      int
+	protocol uint8
+	min      uint16
+	max      uint16
 }
 
 // containsPort returns if protocol and port are in the port range
-func (p *portRange) containsPort(protocol, port int) bool {
+func (p *portRange) containsPort(protocol uint8, port uint16) bool {
 	return protocol == p.protocol && port >= p.min && port <= p.max
 }
 
@@ -22,7 +22,7 @@ type portRangeList struct {
 }
 
 // add adds protocol and ports min and max to the list
-func (p *portRangeList) add(protocol, min, max int) {
+func (p *portRangeList) add(protocol uint8, min, max uint16) {
 	r := portRange{
 		protocol: protocol,
 		min:      min,
@@ -33,7 +33,7 @@ func (p *portRangeList) add(protocol, min, max int) {
 
 // containsPort returns if protocol and port are in any of the port ranges in
 // the list
-func (p *portRangeList) containsPort(protocol, port int) bool {
+func (p *portRangeList) containsPort(protocol uint8, port uint16) bool {
 	for _, r := range p.l {
 		if r.containsPort(protocol, port) {
 			return true
