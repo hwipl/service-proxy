@@ -27,6 +27,13 @@ func (c *control) runControl() {
 			log.Fatal(err)
 		}
 
+		// if connection is not from an allowed ip, drop it
+		ip := conn.RemoteAddr().(*net.TCPAddr).IP
+		if !allowedIPNets.containsIP(ip) {
+			conn.Close()
+			continue
+		}
+
 		// handle client connection
 		handleClient(conn)
 	}
