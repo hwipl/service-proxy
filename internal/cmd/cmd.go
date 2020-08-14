@@ -88,6 +88,9 @@ func runServer() {
 	}
 	log.Printf("Starting server and listening on %s:%d\n", ip,
 		cntrlAddr.Port)
+	for _, ipNet := range allowedIPNets.getAll() {
+		log.Printf("Allowing control connections from %s\n", ipNet)
+	}
 	runControl(cntrlAddr)
 }
 
