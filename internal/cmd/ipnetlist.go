@@ -26,7 +26,7 @@ func (i *ipNetList) add(ipNet *net.IPNet) {
 			// incompatible mask lengths, skip
 			continue
 		}
-		if existing.Contains(ipNet.IP) && eOnes < nOnes {
+		if existing.Contains(ipNet.IP) && eOnes <= nOnes {
 			// existing entry already contains new one, stop
 			return
 		}
