@@ -24,6 +24,9 @@ var (
 	// registerServices is a comma-separated list of services to register
 	// on the server
 	registerServices = ""
+	// allowedIPs is a comma-separated list of all IPs allowed to connect
+	// to the server
+	allowedIPs = "0.0.0.0/0"
 )
 
 func parseTCPAddr(addr string) *net.TCPAddr {
@@ -75,6 +78,14 @@ func runServer() {
 		serverIP = cntrlAddr.IP
 		ip = fmt.Sprintf("%s", cntrlAddr.IP)
 	}
+
+	// parse allowed IP addresses
+	if allowedIPs != "" {
+		aIP := strings.Split(allowedIPs, ",")
+		for _, a := range aIP {
+			parseAllowedIP(a)
+		}
+	}
 	log.Printf("Starting server and listening on %s:%d\n", ip,
 		cntrlAddr.Port)
 	runControl(cntrlAddr)
@@ -118,6 +129,10 @@ func parseCommandLine() {
 	flag.StringVar(&registerServices, "r", registerServices,
 		"register comma-separated list of `services` on server,\n"+
 			"e.g., tcp:8000:80,udp:53000:53000")
+	flag.StringVar(&allowedIPs, "allowed-ips", allowedIPs,
+		"set comma-separated list of `IPs` the server accepts\n"+
+			"service registrations from, e.g.:\n"+
+			"127.0.0.1,192.168.1.0/24")
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
