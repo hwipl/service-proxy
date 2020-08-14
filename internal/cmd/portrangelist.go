@@ -1,5 +1,7 @@
 package cmd
 
+import "fmt"
+
 var (
 	allowedPortRanges portRangeList
 )
@@ -35,6 +37,23 @@ func (p *portRange) merge(other *portRange) {
 // containsPort returns if protocol and port are in the port range
 func (p *portRange) containsPort(protocol uint8, port uint16) bool {
 	return protocol == p.protocol && port >= p.min && port <= p.max
+}
+
+// String converts the port range to a string
+func (p *portRange) String() string {
+	var protocol string
+
+	// convert protocol number to a string if possible
+	switch p.protocol {
+	case protocolTCP:
+		protocol = "tcp"
+	case protocolUDP:
+		protocol = "udp"
+	default:
+		protocol = fmt.Sprintf("%d", p.protocol)
+	}
+
+	return fmt.Sprintf("%s:%d-%d", protocol, p.min, p.max)
 }
 
 // portRangeList is a list of portRanges
