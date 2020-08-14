@@ -52,3 +52,8 @@ func (i *ipNetList) containsIP(ip net.IP) bool {
 	}
 	return false
 }
+
+// getAll returns the list of ip networks
+func (i *ipNetList) getAll() []*net.IPNet {
+	return i.l
+}
