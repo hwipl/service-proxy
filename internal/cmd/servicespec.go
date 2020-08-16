@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -30,6 +31,11 @@ func (s *serviceSpec) toMessage() *message {
 			"specification\n", s.protocol)
 	}
 	return &m
+}
+
+// String converts the service spec to a string
+func (s *serviceSpec) String() string {
+	return fmt.Sprintf("%s:%d:%d", s.protocol, s.port, s.destPort)
 }
 
 // parseServiceSpec parses spec as a service specification with the format
