@@ -21,9 +21,11 @@ func (c *controlClient) runClient() {
 	}
 	c.conn = conn
 	defer c.conn.Close()
+	log.Println("Connected to server", c.serverAddr)
 
 	// send service specs to server
 	for _, spec := range c.specs {
+		log.Printf("Sending service registration %s to server", spec)
 		m := spec.toMessage()
 		tcpWriteToConn(c.conn, m.serialize())
 	}
