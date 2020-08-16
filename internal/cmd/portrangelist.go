@@ -69,21 +69,18 @@ func (p *portRangeList) add(protocol uint8, min, max uint16) {
 		max:      max,
 	}
 
-	// check if the new entry can be combined with existing entries to from
-	// a bigger port range
-	for _, existing := range p.l {
-		r.merge(existing)
-	}
-
 	// check if there is an existing entry that contains the new port
-	// range, or if existing port range entries should be replaced by
-	// the new one
+	// range, if the new entry can be combined with existing entries to
+	// form a bigger port range, and if existing port range entries should
+	// be replaced by the new one
 	k := 0
 	for _, existing := range p.l {
 		if existing.contains(&r) {
 			// existing entry already contains new one, stop here
 			return
 		}
+		// try building a bigger port range with an existing entry
+		r.merge(existing)
 		if r.contains(existing) {
 			// new entry contains existing one, remove existing
 			// entry and add new one later
