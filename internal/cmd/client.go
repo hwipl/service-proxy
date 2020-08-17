@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"net"
+	"time"
 )
 
 // client stores control client information
@@ -103,8 +104,10 @@ func (c *client) handleClient() {
 	defer c.stopClient()
 	log.Println("New connection from client", c.addr)
 	for {
-		// read a message from the connection and parse it
+		// read a message from the connection and parse it; if there is
+		// no message within 30s, assume client is dead and stop
 		var msg message
+		c.conn.SetDeadline(time.Now().Add(30 * time.Second))
 		buf := readFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to client", c.addr)
