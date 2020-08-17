@@ -120,6 +120,8 @@ func (c *client) handleClient() {
 			}
 		case messageDel:
 			// not implemented
+		case messageNop:
+			// just ignore NOP
 		default:
 			// unknown message, stop here
 			return
