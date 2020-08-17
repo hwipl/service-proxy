@@ -88,7 +88,9 @@ func runUDPService(srvAddr, srcAddr, dstAddr *net.UDPAddr) *udpService {
 	// create service
 	conn, err := net.ListenUDP("udp", srvAddr)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Could not create udp service %s<->%s: %s\n",
+			srvAddr, dstAddr, err)
+		return nil
 	}
 	srv := udpService{
 		srvAddr: srvAddr,
