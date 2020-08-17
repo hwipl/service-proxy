@@ -81,6 +81,22 @@ func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 	}
 }
 
+// handleAddMsg handles the client's add message
+func (c *client) handleAddMsg(msg *message) bool {
+	// try to add service
+	if ok := c.addService(msg.Protocol, msg.Port, msg.DestPort); ok {
+		msg.Op = messageOK
+	} else {
+		msg.Op = messageErr
+	}
+
+	// send result back to client
+	if !writeToConn(c.conn, msg.serialize()) {
+		return false
+	}
+	return true
+}
+
 // handleClient handles the client and its control connection
 func (c *client) handleClient() {
 	defer c.conn.Close()
@@ -99,7 +115,9 @@ func (c *client) handleClient() {
 		// handle message types
 		switch msg.Op {
 		case messageAdd:
-			c.addService(msg.Protocol, msg.Port, msg.DestPort)
+			if !c.handleAddMsg(&msg) {
+				return
+			}
 		case messageDel:
 			// not implemented
 		default:
