@@ -14,6 +14,7 @@ const (
 	messageAdd = 2
 	messageDel = 3
 	messageErr = 4
+	messageNop = 5
 
 	// protocol numbers
 	protocolTCP = 6
