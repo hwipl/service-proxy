@@ -43,13 +43,14 @@ func (c *controlClient) runClient() {
 
 		// handle message types
 		var spec serviceSpec
+		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
 		case messageOK:
 			spec.fromMessage(&msg)
-			log.Println("Server replied OK for service registration", &spec)
+			log.Printf(replyFmt, &spec, "OK")
 		case messageErr:
 			spec.fromMessage(&msg)
-			log.Println("Server replied Error for service registration", &spec)
+			log.Printf(replyFmt, &spec, "ERROR")
 		default:
 			// unknown message, stop here
 			log.Println("Unknown reply from server, " +
