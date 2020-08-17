@@ -15,7 +15,7 @@ type client struct {
 }
 
 // addTCPService adds a tcp service to the client
-func (c *client) addTCPService(port, destPort int) {
+func (c *client) addTCPService(port, destPort int) bool {
 	log.Printf("Adding new service for client %s: forward tcp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
@@ -31,9 +31,11 @@ func (c *client) addTCPService(port, destPort int) {
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
-	if runTCPService(&srvAddr, &srcAddr, &dstAddr) != nil {
-		c.tcpPorts[port] = true
+	if runTCPService(&srvAddr, &srcAddr, &dstAddr) == nil {
+		return false
 	}
+	c.tcpPorts[port] = true
+	return true
 }
 
 // addUDPService adds an udp service to the client
