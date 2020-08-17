@@ -116,7 +116,9 @@ func runTCPService(srvAddr, srcAddr, dstAddr *net.TCPAddr) *tcpService {
 	// create service
 	listener, err := net.ListenTCP("tcp", srvAddr)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Could not create tcp service %s<->%s: %s\n",
+			srvAddr, dstAddr, err)
+		return nil
 	}
 	srv := tcpService{
 		srvAddr:  srvAddr,
