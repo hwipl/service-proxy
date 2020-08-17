@@ -75,16 +75,17 @@ func tcpReadToChannel(conn net.Conn, channel chan<- []byte) {
 }
 
 // tcpWriteToConn writes data to conn
-func tcpWriteToConn(conn net.Conn, data []byte) {
+func tcpWriteToConn(conn net.Conn, data []byte) bool {
 	count := 0
 	for count < len(data) {
 		n, err := conn.Write(data[count:])
 		if err != nil {
 			// do more in this case? abort connection?
-			return
+			return false
 		}
 		count += n
 	}
+	return true
 }
 
 // runTCPForwarder starts forwarding traffic between a connection to the
