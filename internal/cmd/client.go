@@ -63,21 +63,21 @@ func (c *client) addUDPService(port, destPort int) bool {
 }
 
 // addService adds a service to the client
-func (c *client) addService(protocol uint8, port, destPort uint16) {
+func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 	// check if port is allowed
 	if !allowedPortRanges.containsPort(protocol, port) {
-		return
+		return false
 	}
 
 	// start service
 	switch protocol {
 	case protocolTCP:
-		c.addTCPService(int(port), int(destPort))
+		return c.addTCPService(int(port), int(destPort))
 	case protocolUDP:
-		c.addUDPService(int(port), int(destPort))
+		return c.addUDPService(int(port), int(destPort))
 	default:
 		// unknown protocol, stop here
-		return
+		return false
 	}
 }
 
