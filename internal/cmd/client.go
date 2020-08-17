@@ -39,7 +39,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 }
 
 // addUDPService adds an udp service to the client
-func (c *client) addUDPService(port, destPort int) {
+func (c *client) addUDPService(port, destPort int) bool {
 	log.Printf("Adding new service for client %s: forward udp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
@@ -55,9 +55,11 @@ func (c *client) addUDPService(port, destPort int) {
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
-	if runUDPService(&srvAddr, &srcAddr, &dstAddr) != nil {
-		c.udpPorts[port] = true
+	if runUDPService(&srvAddr, &srcAddr, &dstAddr) == nil {
+		return false
 	}
+	c.udpPorts[port] = true
+	return true
 }
 
 // addService adds a service to the client
