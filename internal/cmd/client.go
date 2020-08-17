@@ -143,6 +143,19 @@ func readFromConn(conn net.Conn) []byte {
 	return buf
 }
 
+// writeToConn writes buf to conn
+func writeToConn(conn net.Conn, buf []byte) bool {
+	count := 0
+	for count < len(buf) {
+		n, err := conn.Write(buf[count:])
+		if err != nil {
+			return false
+		}
+		count += n
+	}
+	return true
+}
+
 // handleClient handles the client with its control connection conn
 func handleClient(conn net.Conn) {
 	c := client{
