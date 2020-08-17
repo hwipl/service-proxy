@@ -31,12 +31,29 @@ func (c *controlClient) runClient() {
 	}
 
 	// keep connection open
-	buf := make([]byte, messageLen)
 	for {
-		// ignore messages from server for now
-		_, err := c.conn.Read(buf)
-		if err != nil {
-			log.Println("Closing connection to server:", err)
+		// read reply messages from server
+		var msg message
+		buf := readFromConn(c.conn)
+		if buf == nil {
+			log.Println("Closing connection to server")
+			return
+		}
+		msg.parse(buf)
+
+		// handle message types
+		var spec serviceSpec
+		switch msg.Op {
+		case messageOK:
+			spec.fromMessage(&msg)
+			log.Println("Server replied OK for service registration", &spec)
+		case messageErr:
+			spec.fromMessage(&msg)
+			log.Println("Server replied Error for service registration", &spec)
+		default:
+			// unknown message, stop here
+			log.Println("Unknown reply from server, " +
+				"closing connection")
 			return
 		}
 	}
