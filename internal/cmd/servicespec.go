@@ -33,6 +33,20 @@ func (s *serviceSpec) toMessage() *message {
 	return &m
 }
 
+// fromMessage fills this service specification from a message
+func (s *serviceSpec) fromMessage(msg *message) {
+	s.port = msg.Port
+	s.destPort = msg.DestPort
+	switch msg.Protocol {
+	case protocolTCP:
+		s.protocol = "tcp"
+	case protocolUDP:
+		s.protocol = "udp"
+	default:
+		s.protocol = "unknown"
+	}
+}
+
 // String converts the service spec to a string
 func (s *serviceSpec) String() string {
 	return fmt.Sprintf("%s:%d:%d", s.protocol, s.port, s.destPort)
