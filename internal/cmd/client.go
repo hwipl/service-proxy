@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 	"time"
@@ -188,6 +189,9 @@ func handleClient(conn net.Conn) {
 		laddr:    conn.LocalAddr().(*net.TCPAddr),
 		tcpPorts: make(map[int]bool),
 		udpPorts: make(map[int]bool),
+	}
+	if tlsConfig != nil {
+		c.conn = tls.Server(conn, tlsConfig)
 	}
 	go c.handleClient()
 }
