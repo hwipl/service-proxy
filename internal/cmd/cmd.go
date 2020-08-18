@@ -220,6 +220,19 @@ func runClient() {
 		cntrlAddr.Port = defaultPort
 	}
 
+	// parse certificates
+	if certFiles != "" {
+		cert := parseCertFiles()
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			ServerName:   cntrlAddr.IP.String(),
+		}
+		if caCertFiles != "" {
+			rootCAs := parseCACertFiles()
+			tlsConfig.RootCAs = rootCAs
+		}
+	}
+
 	// parse service specifications in registerServices (format
 	// "<protocol>:<port>:<destPort>")
 	if registerServices == "" {
