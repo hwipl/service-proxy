@@ -159,6 +159,7 @@ func readFromConn(conn net.Conn) []byte {
 	for count < messageLen {
 		n, err := conn.Read(buf[count:])
 		if err != nil {
+			log.Println(err)
 			return nil
 		}
 		count += n
