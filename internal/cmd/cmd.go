@@ -127,6 +127,19 @@ func parseAllowedPort(port string) {
 	allowedPortRanges.add(protocol, uint16(min), uint16(max))
 }
 
+func parseCertFiles() tls.Certificate {
+	files := strings.Split(certFiles, ",")
+	if len(files) != 2 {
+		log.Fatal("cannot parse certificate files: ", certFiles)
+	}
+	certFile, keyFile := files[0], files[1]
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		log.Fatal("cannot load certificate: ", err)
+	}
+	return cert
+}
+
 // run in server mode
 func runServer() {
 	ip := ""
