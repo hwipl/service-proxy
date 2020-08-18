@@ -32,6 +32,9 @@ var (
 	// allowedPorts is a comma-separated list of protocol and port (range)
 	// pairs, that are allowed as services on the server
 	allowedPorts = "udp:1024-65535,tcp:1024-65535"
+	// certFiles are the comma-separated certificate and key files used by
+	// this host
+	certFiles = ""
 	// tlsConfig contains the tls config
 	tlsConfig *tls.Config
 )
@@ -207,6 +210,9 @@ func parseCommandLine() {
 		"set comma-separated list of `ports` the server accepts\n"+
 			"in service registrations, e.g.:\n"+
 			"udp:2048-65000,tcp:8000")
+	flag.StringVar(&certFiles, "cert", certFiles,
+		"read this host's certificate and key from comma-separated "+
+			"`files`,\ne.g., cert.pem,key.pem")
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
