@@ -183,6 +183,19 @@ func runServer() {
 		}
 	}
 
+	// parse certificates
+	if certFiles != "" {
+		cert := parseCertFiles()
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+		}
+		if caCertFiles != "" {
+			clientCAs := parseCACertFiles()
+			tlsConfig.ClientCAs = clientCAs
+		}
+	}
+
 	// output info and start server
 	log.Printf("Starting server and listening on %s:%d\n", ip,
 		cntrlAddr.Port)
