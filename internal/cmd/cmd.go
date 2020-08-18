@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"strconv"
@@ -138,6 +140,21 @@ func parseCertFiles() tls.Certificate {
 		log.Fatal("cannot load certificate: ", err)
 	}
 	return cert
+}
+
+func parseCACertFiles() *x509.CertPool {
+	files := strings.Split(caCertFiles, ",")
+	caCertPool := x509.NewCertPool()
+	for _, f := range files {
+		caCert, err := ioutil.ReadFile(f)
+		if err != nil {
+			log.Fatal("cannot read ca-certificate file: ", err)
+		}
+		if !caCertPool.AppendCertsFromPEM(caCert) {
+			log.Fatal("cannot parse ca-certificate file: ", f)
+		}
+	}
+	return caCertPool
 }
 
 // run in server mode
