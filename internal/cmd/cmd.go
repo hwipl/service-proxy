@@ -35,6 +35,8 @@ var (
 	// certFiles are the comma-separated certificate and key files used by
 	// this host
 	certFiles = ""
+	// caCertFiles is a comma-separated list of ca-certificate files
+	caCertFiles = ""
 	// tlsConfig contains the tls config
 	tlsConfig *tls.Config
 )
@@ -213,6 +215,9 @@ func parseCommandLine() {
 	flag.StringVar(&certFiles, "cert", certFiles,
 		"read this host's certificate and key from comma-separated "+
 			"`files`,\ne.g., cert.pem,key.pem")
+	flag.StringVar(&caCertFiles, "ca-certs", caCertFiles,
+		"read accepted ca-certificates from comma-separated list "+
+			"of `files`,\ne.g., cert1.pem,cert2.pem,cert3.pem")
 	flag.Parse()
 
 	// if client address is specified on the command line, run as client
