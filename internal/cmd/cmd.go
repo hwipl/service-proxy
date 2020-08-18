@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -31,6 +32,8 @@ var (
 	// allowedPorts is a comma-separated list of protocol and port (range)
 	// pairs, that are allowed as services on the server
 	allowedPorts = "udp:1024-65535,tcp:1024-65535"
+	// tlsConfig contains the tls config
+	tlsConfig *tls.Config
 )
 
 func parseTCPAddr(addr string) *net.TCPAddr {
