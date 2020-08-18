@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 	"time"
@@ -21,6 +22,9 @@ func (c *controlClient) runClient() {
 		log.Fatal(err)
 	}
 	c.conn = conn
+	if tlsConfig != nil {
+		c.conn = tls.Client(conn, tlsConfig)
+	}
 	defer c.conn.Close()
 	log.Println("Connected to server", c.serverAddr)
 
