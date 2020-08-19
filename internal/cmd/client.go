@@ -194,6 +194,7 @@ func handleClient(conn net.Conn) {
 	tlsInfo := ""
 	if tlsConfig != nil {
 		tlsConn := tls.Server(conn, tlsConfig)
+		tlsConn.SetDeadline(time.Now().Add(15 * time.Second))
 		if err := tlsConn.Handshake(); err != nil {
 			log.Println("TLS handshake with client", c.addr,
 				"failed:", err)
