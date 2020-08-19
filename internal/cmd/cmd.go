@@ -247,8 +247,12 @@ func runClient() {
 	for _, s := range services {
 		specs = append(specs, parseServiceSpec(s))
 	}
-	log.Printf("Starting client and connecting to server %s:%d\n",
-		ip, cntrlAddr.Port)
+	tlsInfo := ""
+	if tlsConfig != nil {
+		tlsInfo = "in mTLS mode "
+	}
+	log.Printf("Starting client %sand connecting to server %s:%d\n",
+		tlsInfo, ip, cntrlAddr.Port)
 
 	// connect to server and configure services
 	runControlClient(cntrlAddr, specs)
