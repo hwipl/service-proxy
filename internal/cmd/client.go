@@ -128,6 +128,8 @@ func (c *client) handleClient() {
 			// just ignore NOP
 		default:
 			// unknown message, stop here
+			log.Println("Unknown message from client", c.addr)
+			log.Println("Closing connection to client", c.addr)
 			return
 		}
 	}
