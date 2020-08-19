@@ -197,7 +197,11 @@ func runServer() {
 	}
 
 	// output info and start server
-	log.Printf("Starting server and listening on %s:%d\n", ip,
+	tlsInfo := ""
+	if tlsConfig != nil {
+		tlsInfo = "in mTLS mode "
+	}
+	log.Printf("Starting server %sand listening on %s:%d\n", tlsInfo, ip,
 		cntrlAddr.Port)
 	for _, ipNet := range allowedIPNets.getAll() {
 		log.Printf("Allowing control connections from %s\n", ipNet)
