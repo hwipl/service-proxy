@@ -103,7 +103,6 @@ func (c *client) handleAddMsg(msg *message) bool {
 func (c *client) handleClient() {
 	defer c.conn.Close()
 	defer c.stopClient()
-	log.Println("New connection from client", c.addr)
 	for {
 		// read a message from the connection and parse it; if there is
 		// no message within 30s, assume client is dead and stop
@@ -192,6 +191,7 @@ func handleClient(conn net.Conn) {
 		tcpPorts: make(map[int]bool),
 		udpPorts: make(map[int]bool),
 	}
+	tlsInfo := ""
 	if tlsConfig != nil {
 		tlsConn := tls.Server(conn, tlsConfig)
 		if err := tlsConn.Handshake(); err != nil {
@@ -200,7 +200,11 @@ func handleClient(conn net.Conn) {
 			tlsConn.Close()
 			return
 		}
+		clientCert := tlsConn.ConnectionState().PeerCertificates[0]
+		commonName := clientCert.Subject.CommonName
+		tlsInfo = " (CN=" + commonName + ")"
 		c.conn = tlsConn
 	}
+	log.Printf("New connection from client %s%s\n", c.addr, tlsInfo)
 	go c.handleClient()
 }
