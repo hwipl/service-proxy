@@ -193,7 +193,14 @@ func handleClient(conn net.Conn) {
 		udpPorts: make(map[int]bool),
 	}
 	if tlsConfig != nil {
-		c.conn = tls.Server(conn, tlsConfig)
+		tlsConn := tls.Server(conn, tlsConfig)
+		if err := tlsConn.Handshake(); err != nil {
+			log.Println("TLS handshake with client", c.addr,
+				"failed:", err)
+			tlsConn.Close()
+			return
+		}
+		c.conn = tlsConn
 	}
 	go c.handleClient()
 }
