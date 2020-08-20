@@ -29,6 +29,7 @@ func (c *controlClient) runClient() {
 	log.Println("Connected to server", c.serverAddr)
 
 	// send service specs to server
+	active := 0
 	for _, spec := range c.specs {
 		log.Printf("Sending service registration %s to server", spec)
 		m := spec.toMessage()
@@ -50,6 +51,7 @@ func (c *controlClient) runClient() {
 		case messageOK:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "OK")
+			active++
 		case messageErr:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "ERROR")
@@ -60,6 +62,9 @@ func (c *controlClient) runClient() {
 			return
 		}
 	}
+	log.Printf("Registered %d service(s) on the server, "+
+		"keeping connection open", active)
+
 	// keep connection open
 	go func() {
 		for {
