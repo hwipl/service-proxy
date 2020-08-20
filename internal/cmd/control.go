@@ -30,6 +30,8 @@ func (c *control) runControl() {
 		// if connection is not from an allowed ip, drop it
 		ip := conn.RemoteAddr().(*net.TCPAddr).IP
 		if !allowedIPNets.containsIP(ip) {
+			log.Printf("Dropping new connection from %s: "+
+				"IP not allowed\n", conn.RemoteAddr())
 			conn.Close()
 			continue
 		}
