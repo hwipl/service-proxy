@@ -137,5 +137,7 @@ func runTCPService(srvAddr, srcAddr, dstAddr *net.TCPAddr) *tcpService {
 		return &srv
 	}
 
+	log.Printf("Could not create tcp service %s<->%s: service already "+
+		"active\n", srvAddr, dstAddr)
 	return nil
 }

@@ -108,5 +108,7 @@ func runUDPService(srvAddr, srcAddr, dstAddr *net.UDPAddr) *udpService {
 		return &srv
 	}
 
+	log.Printf("Could not create udp service %s<->%s: service already "+
+		"active\n", srvAddr, dstAddr)
 	return nil
 }
