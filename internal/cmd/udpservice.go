@@ -86,20 +86,23 @@ func (u *udpService) stopService() {
 // incomming packets to dstAddr
 func runUDPService(srvAddr, srcAddr, dstAddr *net.UDPAddr) *udpService {
 	// create service
-	conn, err := net.ListenUDP("udp", srvAddr)
-	if err != nil {
-		log.Printf("Could not create udp service %s<->%s: %s\n",
-			srvAddr, dstAddr, err)
-		return nil
-	}
 	srv := udpService{
 		srvAddr: srvAddr,
 		srcAddr: srcAddr,
 		dstAddr: dstAddr,
-		conn:    conn,
 	}
 
 	if udpServices.add(srvAddr.Port, &srv) {
+		// create udp listener/udp conn
+		conn, err := net.ListenUDP("udp", srvAddr)
+		if err != nil {
+			log.Printf("Could not create udp service %s<->%s: %s\n",
+				srvAddr, dstAddr, err)
+			udpServices.del(srvAddr.Port)
+			return nil
+		}
+		srv.conn = conn
+
 		// run service
 		go srv.runService()
 		return &srv
