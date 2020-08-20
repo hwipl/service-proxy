@@ -114,21 +114,24 @@ func (t *tcpService) stopService() {
 // incoming connections to dstAddr from srcAddr
 func runTCPService(srvAddr, srcAddr, dstAddr *net.TCPAddr) *tcpService {
 	// create service
-	listener, err := net.ListenTCP("tcp", srvAddr)
-	if err != nil {
-		log.Printf("Could not create tcp service %s<->%s: %s\n",
-			srvAddr, dstAddr, err)
-		return nil
-	}
 	srv := tcpService{
-		srvAddr:  srvAddr,
-		srcAddr:  srcAddr,
-		dstAddr:  dstAddr,
-		listener: listener,
-		mutex:    &sync.Mutex{},
+		srvAddr: srvAddr,
+		srcAddr: srcAddr,
+		dstAddr: dstAddr,
+		mutex:   &sync.Mutex{},
 	}
 
 	if tcpServices.add(srvAddr.Port, &srv) {
+		// create tcp listener
+		listener, err := net.ListenTCP("tcp", srvAddr)
+		if err != nil {
+			log.Printf("Could not create tcp service %s<->%s: %s\n",
+				srvAddr, dstAddr, err)
+			tcpServices.del(srvAddr.Port)
+			return nil
+		}
+		srv.listener = listener
+
 		// run service
 		go srv.runService()
 		return &srv
