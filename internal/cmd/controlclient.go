@@ -62,6 +62,13 @@ func (c *controlClient) runClient() {
 			return
 		}
 	}
+
+	// are any services active on the server?
+	if active == 0 {
+		log.Println("Could not register any service on the server, " +
+			"closing connection")
+		return
+	}
 	log.Printf("Registered %d service(s) on the server, "+
 		"keeping connection open", active)
 
