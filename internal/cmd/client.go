@@ -174,7 +174,8 @@ func readFromConn(conn net.Conn) []byte {
 	for count < messageLen {
 		n, err := conn.Read(buf[count:])
 		if err != nil {
-			log.Println(err)
+			log.Printf("Connection to %s: %s\n",
+				conn.RemoteAddr(), err)
 			return nil
 		}
 		count += n
