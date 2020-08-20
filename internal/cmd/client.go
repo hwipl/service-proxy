@@ -21,7 +21,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 	log.Printf("Adding new service for client %s: forward tcp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
-	// create tcp addresses and start tcp service
+	// create tcp addresses
 	srvAddr := net.TCPAddr{
 		IP:   serverIP,
 		Port: port,
@@ -33,6 +33,15 @@ func (c *client) addTCPService(port, destPort int) bool {
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
+
+	// check if port is allowed
+	if !allowedPortRanges.containsPort(protocolTCP, uint16(port)) {
+		log.Printf("Could not create tcp service %s<->%s: "+
+			"port not allowed\n", &srvAddr, &dstAddr)
+		return false
+	}
+
+	// start tcp service
 	if runTCPService(&srvAddr, &srcAddr, &dstAddr) == nil {
 		return false
 	}
@@ -45,7 +54,7 @@ func (c *client) addUDPService(port, destPort int) bool {
 	log.Printf("Adding new service for client %s: forward udp port %d "+
 		"to port %d\n", c.addr, port, destPort)
 
-	// create udp addresses and start udp service
+	// create udp addresses
 	srvAddr := net.UDPAddr{
 		IP:   serverIP,
 		Port: port,
@@ -57,6 +66,15 @@ func (c *client) addUDPService(port, destPort int) bool {
 		IP:   c.addr.IP,
 		Port: destPort,
 	}
+
+	// check if port is allowed
+	if !allowedPortRanges.containsPort(protocolUDP, uint16(port)) {
+		log.Printf("Could not create udp service %s<->%s: "+
+			"port not allowed\n", &srvAddr, &dstAddr)
+		return false
+	}
+
+	// start udp service
 	if runUDPService(&srvAddr, &srcAddr, &dstAddr) == nil {
 		return false
 	}
@@ -66,11 +84,6 @@ func (c *client) addUDPService(port, destPort int) bool {
 
 // addService adds a service to the client
 func (c *client) addService(protocol uint8, port, destPort uint16) bool {
-	// check if port is allowed
-	if !allowedPortRanges.containsPort(protocol, port) {
-		return false
-	}
-
 	// start service
 	switch protocol {
 	case protocolTCP:
