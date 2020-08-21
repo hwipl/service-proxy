@@ -98,3 +98,23 @@ func TestPortRangeListContainsPort(t *testing.T) {
 	test(2048)
 	test(4096)
 }
+
+func TestPortRangeListGetAll(t *testing.T) {
+	var want, got string
+	var ports portRangeList
+
+	ports.add(protocolTCP, 1024, 2048)
+	ports.add(protocolTCP, 4096, 8192)
+	ports.add(protocolTCP, 16384, 32768)
+
+	want = "tcp:1024-2048 tcp:4096-8192 tcp:16384-32768"
+	for i, p := range ports.getAll() {
+		if i != 0 {
+			got += " "
+		}
+		got += p.String()
+	}
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
+	}
+}
