@@ -72,3 +72,33 @@ func TestIPNetListAdd(t *testing.T) {
 	want = []string{"0.0.0.0/0"}
 	test()
 }
+
+func TestIPNetListContainsIP(t *testing.T) {
+	var want, got bool
+	var ipList *ipNetList
+	var ip net.IP
+	test := func() {
+		got = ipList.containsIP(ip)
+		if got != want {
+			t.Errorf("got %t, want %t", got, want)
+		}
+	}
+
+	addrs := []string{
+		"10.0.0.0/8",
+		"172.16.0.0/16",
+		"192.168.1.0/24",
+		"127.0.0.1/32",
+	}
+	ipList = testStringsToIPNetList(addrs...)
+
+	// test ip in list
+	ip = net.ParseIP("172.16.1.32")
+	want = true
+	test()
+
+	// test ip not in list
+	ip = net.ParseIP("127.0.0.3")
+	want = false
+	test()
+}
