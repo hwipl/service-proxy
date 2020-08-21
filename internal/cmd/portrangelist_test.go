@@ -74,3 +74,27 @@ func TestPortRangeListAdd(t *testing.T) {
 	}
 	test()
 }
+
+func TestPortRangeListContainsPort(t *testing.T) {
+	var want, got bool
+	var ports portRangeList
+	var test = func(port uint16) {
+		got = ports.containsPort(protocolTCP, port)
+		if got != want {
+			t.Errorf("port %d: got %t, want %t", port, got, want)
+		}
+	}
+
+	// prepare port range list
+	ports.add(protocolTCP, 1024, 4096)
+
+	// test port not in range
+	want = false
+	test(128)
+
+	// test ports in range
+	want = true
+	test(1024)
+	test(2048)
+	test(4096)
+}
