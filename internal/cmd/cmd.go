@@ -34,9 +34,10 @@ var (
 	// allowedPorts is a comma-separated list of protocol and port (range)
 	// pairs, that are allowed as services on the server
 	allowedPorts = "udp:1024-65535,tcp:1024-65535"
-	// certFiles are the comma-separated certificate and key files used by
-	// this host
-	certFiles = ""
+	// certFile is the certificate file used by this host
+	certFile = ""
+	// keyFile is the key file for the certificate used by this host
+	keyFile = ""
 	// caCertFiles is a comma-separated list of ca-certificate files
 	caCertFiles = ""
 	// tlsConfig contains the tls config
@@ -130,11 +131,10 @@ func parseAllowedPort(port string) {
 }
 
 func parseCertFiles() tls.Certificate {
-	files := strings.Split(certFiles, ",")
-	if len(files) != 2 {
-		log.Fatal("cannot parse certificate files: ", certFiles)
+	if keyFile == "" {
+		log.Fatal("key file for this host's certificate must " +
+			"be specified")
 	}
-	certFile, keyFile := files[0], files[1]
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		log.Fatal("cannot load certificate: ", err)
@@ -184,7 +184,7 @@ func runServer() {
 	}
 
 	// parse certificates
-	if certFiles != "" {
+	if certFile != "" {
 		cert := parseCertFiles()
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
@@ -225,7 +225,7 @@ func runClient() {
 	}
 
 	// parse certificates
-	if certFiles != "" {
+	if certFile != "" {
 		cert := parseCertFiles()
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
@@ -276,9 +276,11 @@ func parseCommandLine() {
 		"set comma-separated list of `ports` the server accepts\n"+
 			"in service registrations, e.g.:\n"+
 			"udp:2048-65000,tcp:8000")
-	flag.StringVar(&certFiles, "cert", certFiles,
-		"read this host's certificate and key from comma-separated "+
-			"`files`,\ne.g., cert.pem,key.pem")
+	flag.StringVar(&certFile, "cert", certFile,
+		"read this host's certificate from `file`, e.g., cert.pem")
+	flag.StringVar(&keyFile, "key", keyFile,
+		"read the key of this host's certificate from `file`, "+
+			"e.g., key.pem")
 	flag.StringVar(&caCertFiles, "ca-certs", caCertFiles,
 		"read accepted ca-certificates from comma-separated list "+
 			"of `files`,\ne.g., cert1.pem,cert2.pem,cert3.pem")
