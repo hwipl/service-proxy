@@ -31,14 +31,17 @@ func testIPNetListToStrings(ipList *ipNetList) []string {
 
 func TestIPNetListAdd(t *testing.T) {
 	var addrs, want, got []string
+	test := func() {
+		got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %s, want %s", got, want)
+		}
+	}
 
 	// add single ip network
 	addrs = []string{"192.168.1.1/32"}
 	want = addrs
-	got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %s, want %s", got, want)
-	}
+	test()
 
 	// add multiple different ip networks
 	addrs = []string{
@@ -48,24 +51,18 @@ func TestIPNetListAdd(t *testing.T) {
 		"127.0.0.0/32",
 	}
 	want = addrs
-	got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %s, want %s", got, want)
-	}
+	test()
 
-	// add ip networks containing each other
+	// add ip networks containing each-other, network size decreasing
 	addrs = []string{
 		"10.0.0.0/8",
 		"10.0.0.0/16",
 		"10.0.0.0/32",
 	}
 	want = []string{"10.0.0.0/8"}
-	got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %s, want %s", got, want)
-	}
+	test()
 
-	// add ip networks containing each other, other order
+	// add ip networks containing each-other, network size increasing
 	addrs = []string{
 		"10.0.0.0/32",
 		"10.0.0.0/16",
@@ -73,8 +70,5 @@ func TestIPNetListAdd(t *testing.T) {
 		"10.0.0.0/0",
 	}
 	want = []string{"0.0.0.0/0"}
-	got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %s, want %s", got, want)
-	}
+	test()
 }
