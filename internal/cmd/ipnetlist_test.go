@@ -102,3 +102,26 @@ func TestIPNetListContainsIP(t *testing.T) {
 	want = false
 	test()
 }
+
+func TestIPNetListGetAll(t *testing.T) {
+	// test empty list
+	ipList := &ipNetList{}
+	gotNets := ipList.getAll()
+	var wantNets []*net.IPNet = nil
+	if !reflect.DeepEqual(gotNets, wantNets) {
+		t.Errorf("got %s, want %s", gotNets, wantNets)
+	}
+
+	// test filled list
+	addrs := []string{
+		"10.0.0.0/8",
+		"172.16.0.0/16",
+		"192.168.1.0/24",
+		"127.0.0.1/32",
+	}
+	gotStrings := testIPNetListToStrings(testStringsToIPNetList(addrs...))
+	wantStrings := addrs
+	if !reflect.DeepEqual(gotStrings, wantStrings) {
+		t.Errorf("got %s, want %s", gotStrings, wantStrings)
+	}
+}
