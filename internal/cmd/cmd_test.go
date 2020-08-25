@@ -80,19 +80,22 @@ Wf86aX6PepsntZv2GYlA5UpabfT2EZICICpJ5h/iI+i341gBmLiAFQOyTDT+/wQc
 	return createTestFile(name, certPem)
 }
 
-func TestParseCertFiles(t *testing.T) {
+func createTestKeyFile(name string) *os.File {
 	keyPem := []byte(`-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIIrYSSNQFaA2Hwf1duRSxKtLYX5CB04fSeQ6tF1aY/PuoAoGCCqGSM49
 AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
 EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
 -----END EC PRIVATE KEY-----`)
+	return createTestFile(name, keyPem)
+}
 
+func TestParseCertFiles(t *testing.T) {
 	// create certificate file
 	cf := createTestCertFile("parsecertfilestest-cert-*.pem")
 	defer os.Remove(cf.Name())
 
 	// create key file
-	kf := createTestFile("parsecertfilestest-key-*.pem", keyPem)
+	kf := createTestKeyFile("parsecertfilestest-key-*.pem")
 	defer os.Remove(kf.Name())
 
 	// test parsing
