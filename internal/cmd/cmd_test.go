@@ -103,3 +103,17 @@ func TestParseCertFiles(t *testing.T) {
 	keyFile = kf.Name()
 	parseCertFiles()
 }
+
+func TestParseCACertFiles(t *testing.T) {
+	// create certificate file
+	cf := createTestCertFile("parsecacertfilestest-cert-*.pem")
+	defer os.Remove(cf.Name())
+
+	// test single file parsing
+	caCertFiles = cf.Name()
+	parseCACertFiles()
+
+	// test multiple files parsing
+	caCertFiles += "," + cf.Name() + "," + cf.Name()
+	parseCACertFiles()
+}
