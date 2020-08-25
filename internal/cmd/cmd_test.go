@@ -65,7 +65,7 @@ func createTestFile(name string, content []byte) *os.File {
 	return tmpFile
 }
 
-func TestParseCertFiles(t *testing.T) {
+func createTestCertFile(name string) *os.File {
 	certPem := []byte(`-----BEGIN CERTIFICATE-----
 MIIBhTCCASugAwIBAgIQIRi6zePL6mKjOipn+dNuaTAKBggqhkjOPQQDAjASMRAw
 DgYDVQQKEwdBY21lIENvMB4XDTE3MTAyMDE5NDMwNloXDTE4MTAyMDE5NDMwNlow
@@ -77,6 +77,10 @@ NDUzgg4xMjcuMC4wLjE6NTQ1MzAKBggqhkjOPQQDAgNIADBFAiEA2zpJEPQyz6/l
 Wf86aX6PepsntZv2GYlA5UpabfT2EZICICpJ5h/iI+i341gBmLiAFQOyTDT+/wQc
 6MF9+Yw1Yy0t
 -----END CERTIFICATE-----`)
+	return createTestFile(name, certPem)
+}
+
+func TestParseCertFiles(t *testing.T) {
 	keyPem := []byte(`-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIIrYSSNQFaA2Hwf1duRSxKtLYX5CB04fSeQ6tF1aY/PuoAoGCCqGSM49
 AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
@@ -84,7 +88,7 @@ EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
 -----END EC PRIVATE KEY-----`)
 
 	// create certificate file
-	cf := createTestFile("parsecertfilestest-cert-*.pem", certPem)
+	cf := createTestCertFile("parsecertfilestest-cert-*.pem")
 	defer os.Remove(cf.Name())
 
 	// create key file
