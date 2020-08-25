@@ -51,6 +51,20 @@ func TestParseAllowedPort(t *testing.T) {
 	}
 }
 
+func createTestFile(name string, content []byte) *os.File {
+	tmpFile, err := ioutil.TempFile("", name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if _, err := tmpFile.Write(content); err != nil {
+		log.Fatal(err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		log.Fatal(err)
+	}
+	return tmpFile
+}
+
 func TestParseCertFiles(t *testing.T) {
 	certPem := []byte(`-----BEGIN CERTIFICATE-----
 MIIBhTCCASugAwIBAgIQIRi6zePL6mKjOipn+dNuaTAKBggqhkjOPQQDAjASMRAw
@@ -69,27 +83,12 @@ AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
 EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
 -----END EC PRIVATE KEY-----`)
 
-	// create file function
-	createFile := func(name string, content []byte) *os.File {
-		tmpFile, err := ioutil.TempFile("", name)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if _, err := tmpFile.Write(content); err != nil {
-			log.Fatal(err)
-		}
-		if err := tmpFile.Close(); err != nil {
-			log.Fatal(err)
-		}
-		return tmpFile
-	}
-
 	// create certificate file
-	cf := createFile("parsecertfilestest-cert-*.pem", certPem)
+	cf := createTestFile("parsecertfilestest-cert-*.pem", certPem)
 	defer os.Remove(cf.Name())
 
 	// create key file
-	kf := createFile("parsecertfilestest-key-*.pem", keyPem)
+	kf := createTestFile("parsecertfilestest-key-*.pem", keyPem)
 	defer os.Remove(kf.Name())
 
 	// test parsing
