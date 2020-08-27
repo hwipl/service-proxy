@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/hwipl/service-proxy/internal/network"
@@ -97,7 +98,15 @@ func (c *controlClient) runClient() {
 
 // RunControlClient runs the control client
 func RunControlClient(cntrlAddr *net.TCPAddr, tlsConfig *tls.Config,
-	specs []*ServiceSpec) {
+	// parse service specifications (format "<protocol>:<port>:<destPort>")
+	serviceSpecs string) {
+	services := strings.Split(serviceSpecs, ",")
+	var specs []*ServiceSpec
+	for _, s := range services {
+		specs = append(specs, ParseServiceSpec(s))
+	}
+
+	// create and run control client
 	c := controlClient{
 		serverAddr: cntrlAddr,
 		tlsConfig:  tlsConfig,

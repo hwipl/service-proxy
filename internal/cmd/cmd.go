@@ -238,17 +238,12 @@ func runClient() {
 			tlsConfig.RootCAs = rootCAs
 		}
 	}
-
-	// parse service specifications in registerServices (format
-	// "<protocol>:<port>:<destPort>")
+	// check if services are specified by user
 	if registerServices == "" {
 		log.Fatal("No services specified")
 	}
-	services := strings.Split(registerServices, ",")
-	var specs []*pclient.ServiceSpec
-	for _, s := range services {
-		specs = append(specs, pclient.ParseServiceSpec(s))
-	}
+
+	// print server info and run control client
 	tlsInfo := ""
 	if tlsConfig != nil {
 		tlsInfo = "in mTLS mode "
@@ -257,7 +252,7 @@ func runClient() {
 		tlsInfo, ip, cntrlAddr.Port)
 
 	// connect to server and configure services
-	pclient.RunControlClient(cntrlAddr, tlsConfig, specs)
+	pclient.RunControlClient(cntrlAddr, tlsConfig, registerServices)
 }
 
 // parseCommandLine parses the command line arguments
