@@ -95,9 +95,9 @@ func parseAllowedPort(port string) {
 	protocol := uint8(0)
 	switch protPorts[0] {
 	case "tcp":
-		protocol = protocolTCP
+		protocol = ProtocolTCP
 	case "udp":
-		protocol = protocolUDP
+		protocol = ProtocolUDP
 	default:
 		log.Fatal("unknown protocol in allowed port: ", port)
 	}

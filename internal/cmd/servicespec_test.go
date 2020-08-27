@@ -8,9 +8,9 @@ func TestServiceSpecToMessage(t *testing.T) {
 		port:     1024,
 		destPort: 1024,
 	}
-	want := message{
-		Op:       messageAdd,
-		Protocol: protocolTCP,
+	want := Message{
+		Op:       MessageAdd,
+		Protocol: ProtocolTCP,
 		Port:     1024,
 		DestPort: 1024,
 	}
@@ -21,9 +21,9 @@ func TestServiceSpecToMessage(t *testing.T) {
 }
 
 func TestServiceSpecFromMessage(t *testing.T) {
-	m := message{
-		Op:       messageAdd,
-		Protocol: protocolTCP,
+	m := Message{
+		Op:       MessageAdd,
+		Protocol: ProtocolTCP,
 		Port:     1024,
 		DestPort: 1024,
 	}

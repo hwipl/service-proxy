@@ -35,7 +35,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(protocolTCP, uint16(port)) {
+	if !allowedPortRanges.containsPort(ProtocolTCP, uint16(port)) {
 		log.Printf("Could not create tcp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -68,7 +68,7 @@ func (c *client) addUDPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(protocolUDP, uint16(port)) {
+	if !allowedPortRanges.containsPort(ProtocolUDP, uint16(port)) {
 		log.Printf("Could not create udp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -86,9 +86,9 @@ func (c *client) addUDPService(port, destPort int) bool {
 func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 	// start service
 	switch protocol {
-	case protocolTCP:
+	case ProtocolTCP:
 		return c.addTCPService(int(port), int(destPort))
-	case protocolUDP:
+	case ProtocolUDP:
 		return c.addUDPService(int(port), int(destPort))
 	default:
 		// unknown protocol, stop here
@@ -97,16 +97,16 @@ func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 }
 
 // handleAddMsg handles the client's add message
-func (c *client) handleAddMsg(msg *message) bool {
+func (c *client) handleAddMsg(msg *Message) bool {
 	// try to add service
 	if ok := c.addService(msg.Protocol, msg.Port, msg.DestPort); ok {
-		msg.Op = messageOK
+		msg.Op = MessageOK
 	} else {
-		msg.Op = messageErr
+		msg.Op = MessageErr
 	}
 
 	// send result back to client
-	if !writeToConn(c.conn, msg.serialize()) {
+	if !writeToConn(c.conn, msg.Serialize()) {
 		return false
 	}
 	return true
@@ -119,24 +119,24 @@ func (c *client) handleClient() {
 	for {
 		// read a message from the connection and parse it; if there is
 		// no message within 30s, assume client is dead and stop
-		var msg message
+		var msg Message
 		c.conn.SetDeadline(time.Now().Add(30 * time.Second))
 		buf := readFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to client", c.addr)
 			return
 		}
-		msg.parse(buf)
+		msg.Parse(buf)
 
 		// handle message types
 		switch msg.Op {
-		case messageAdd:
+		case MessageAdd:
 			if !c.handleAddMsg(&msg) {
 				return
 			}
-		case messageDel:
+		case MessageDel:
 			// not implemented
-		case messageNop:
+		case MessageNop:
 			// just ignore NOP
 		default:
 			// unknown message, stop here
@@ -169,9 +169,9 @@ func (c *client) stopClient() {
 
 // readFromConn reads messageLen bytes from conn
 func readFromConn(conn net.Conn) []byte {
-	buf := make([]byte, messageLen)
+	buf := make([]byte, MessageLen)
 	count := 0
-	for count < messageLen {
+	for count < MessageLen {
 		n, err := conn.Read(buf[count:])
 		if err != nil {
 			log.Printf("Connection to %s: %s\n",

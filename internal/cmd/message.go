@@ -7,30 +7,30 @@ import (
 )
 
 const (
-	messageLen = 6
+	MessageLen = 6
 
 	// message types
-	messageOK  = 1
-	messageAdd = 2
-	messageDel = 3
-	messageErr = 4
-	messageNop = 5
+	MessageOK  = 1
+	MessageAdd = 2
+	MessageDel = 3
+	MessageErr = 4
+	MessageNop = 5
 
 	// protocol numbers
-	protocolTCP = 6
-	protocolUDP = 17
+	ProtocolTCP = 6
+	ProtocolUDP = 17
 )
 
-// message stores a control message
-type message struct {
+// Message stores a control Message
+type Message struct {
 	Op       uint8
 	Protocol uint8
 	Port     uint16
 	DestPort uint16
 }
 
-// serialize writes message to a byte slice
-func (m *message) serialize() []byte {
+// Serialize writes message to a byte slice
+func (m *Message) Serialize() []byte {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.BigEndian, m)
 	if err != nil {
@@ -39,8 +39,8 @@ func (m *message) serialize() []byte {
 	return buf.Bytes()
 }
 
-// parse reads message from byte slice b
-func (m *message) parse(b []byte) {
+// Parse reads message from byte slice b
+func (m *Message) Parse(b []byte) {
 	buf := bytes.NewBuffer(b)
 	err := binary.Read(buf, binary.BigEndian, m)
 	if err != nil {

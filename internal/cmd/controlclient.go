@@ -33,26 +33,26 @@ func (c *controlClient) runClient() {
 	for _, spec := range c.specs {
 		log.Printf("Sending service registration %s to server", spec)
 		m := spec.toMessage()
-		tcpWriteToConn(c.conn, m.serialize())
+		tcpWriteToConn(c.conn, m.Serialize())
 
 		// read reply messages from server
-		var msg message
+		var msg Message
 		buf := readFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to server")
 			return
 		}
-		msg.parse(buf)
+		msg.Parse(buf)
 
 		// handle message types
 		var spec serviceSpec
 		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
-		case messageOK:
+		case MessageOK:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "OK")
 			active++
-		case messageErr:
+		case MessageErr:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "ERROR")
 		default:
@@ -77,8 +77,8 @@ func (c *controlClient) runClient() {
 		for {
 			// send a keep-alive/NOP message every 15 seconds
 			time.Sleep(15 * time.Second)
-			keepAlive := message{Op: messageNop}
-			if !tcpWriteToConn(c.conn, keepAlive.serialize()) {
+			keepAlive := Message{Op: MessageNop}
+			if !tcpWriteToConn(c.conn, keepAlive.Serialize()) {
 				return
 			}
 		}

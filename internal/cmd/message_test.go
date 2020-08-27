@@ -6,31 +6,31 @@ import (
 )
 
 func TestMessageSerialize(t *testing.T) {
-	msg := message{
-		Op:       messageAdd,
-		Protocol: protocolUDP,
+	msg := Message{
+		Op:       MessageAdd,
+		Protocol: ProtocolUDP,
 		Port:     65535,
 		DestPort: 65535,
 	}
 
-	want := []byte{messageAdd, protocolUDP, 255, 255, 255, 255}
-	got := msg.serialize()
+	want := []byte{MessageAdd, ProtocolUDP, 255, 255, 255, 255}
+	got := msg.Serialize()
 	if bytes.Compare(got, want) != 0 {
 		t.Errorf("got %v, want %v", got, want)
 	}
 }
 
 func TestMessageParse(t *testing.T) {
-	msg := []byte{messageOK, protocolTCP, 255, 255, 255, 255}
+	msg := []byte{MessageOK, ProtocolTCP, 255, 255, 255, 255}
 
-	want := message{
-		Op:       messageOK,
-		Protocol: protocolTCP,
+	want := Message{
+		Op:       MessageOK,
+		Protocol: ProtocolTCP,
 		Port:     65535,
 		DestPort: 65535,
 	}
-	got := message{}
-	got.parse(msg)
+	got := Message{}
+	got.Parse(msg)
 	if got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}

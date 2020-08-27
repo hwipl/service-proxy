@@ -45,9 +45,9 @@ func (p *portRange) String() string {
 
 	// convert protocol number to a string if possible
 	switch p.protocol {
-	case protocolTCP:
+	case ProtocolTCP:
 		protocol = "tcp"
-	case protocolUDP:
+	case ProtocolUDP:
 		protocol = "udp"
 	default:
 		protocol = fmt.Sprintf("%d", p.protocol)
