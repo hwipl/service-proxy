@@ -108,7 +108,7 @@ func (c *client) handleAddMsg(msg *network.Message) bool {
 	}
 
 	// send result back to client
-	if !writeToConn(c.conn, msg.Serialize()) {
+	if !WriteToConn(c.conn, msg.Serialize()) {
 		return false
 	}
 	return true
@@ -169,8 +169,8 @@ func (c *client) stopClient() {
 	}
 }
 
-// writeToConn writes buf to conn
-func writeToConn(conn net.Conn, buf []byte) bool {
+// WriteToConn writes buf to conn
+func WriteToConn(conn net.Conn, buf []byte) bool {
 	count := 0
 	for count < len(buf) {
 		n, err := conn.Write(buf[count:])
