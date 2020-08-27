@@ -32,7 +32,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from service peer to destination
-			tcpWriteToConn(t.dstConn, data)
+			TCPWriteToConn(t.dstConn, data)
 		case data, more := <-t.dstData:
 			if !more {
 				// no more data from destination connection,
@@ -45,7 +45,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from destination to service peer
-			tcpWriteToConn(t.srvConn, data)
+			TCPWriteToConn(t.srvConn, data)
 		}
 
 		// if both channels are closed, stop
@@ -74,8 +74,8 @@ func tcpReadToChannel(conn net.Conn, channel chan<- []byte) {
 	}
 }
 
-// tcpWriteToConn writes data to conn
-func tcpWriteToConn(conn net.Conn, data []byte) bool {
+// TCPWriteToConn writes data to conn
+func TCPWriteToConn(conn net.Conn, data []byte) bool {
 	count := 0
 	for count < len(data) {
 		n, err := conn.Write(data[count:])
