@@ -1,4 +1,4 @@
-package cmd
+package pclient
 
 import (
 	"crypto/tls"
@@ -7,14 +7,13 @@ import (
 	"time"
 
 	"github.com/hwipl/service-proxy/internal/network"
-	"github.com/hwipl/service-proxy/internal/pclient"
 )
 
 // controlClient stores control client information
 type controlClient struct {
 	serverAddr *net.TCPAddr
 	tlsConfig  *tls.Config
-	specs      []*pclient.ServiceSpec
+	specs      []*ServiceSpec
 	conn       net.Conn
 }
 
@@ -49,7 +48,7 @@ func (c *controlClient) runClient() {
 		msg.Parse(buf)
 
 		// handle message types
-		var spec pclient.ServiceSpec
+		var spec ServiceSpec
 		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
 		case network.MessageOK:
@@ -98,7 +97,7 @@ func (c *controlClient) runClient() {
 
 // RunControlClient runs the control client
 func RunControlClient(cntrlAddr *net.TCPAddr, tlsConfig *tls.Config,
-	specs []*pclient.ServiceSpec) {
+	specs []*ServiceSpec) {
 	c := controlClient{
 		serverAddr: cntrlAddr,
 		tlsConfig:  tlsConfig,
