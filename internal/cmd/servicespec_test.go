@@ -7,10 +7,10 @@ import (
 )
 
 func TestServiceSpecToMessage(t *testing.T) {
-	s := serviceSpec{
-		protocol: "tcp",
-		port:     1024,
-		destPort: 1024,
+	s := ServiceSpec{
+		Protocol: "tcp",
+		Port:     1024,
+		DestPort: 1024,
 	}
 	want := network.Message{
 		Op:       network.MessageAdd,
@@ -18,7 +18,7 @@ func TestServiceSpecToMessage(t *testing.T) {
 		Port:     1024,
 		DestPort: 1024,
 	}
-	got := s.toMessage()
+	got := s.ToMessage()
 	if *got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
@@ -31,23 +31,23 @@ func TestServiceSpecFromMessage(t *testing.T) {
 		Port:     1024,
 		DestPort: 1024,
 	}
-	want := serviceSpec{
-		protocol: "tcp",
-		port:     1024,
-		destPort: 1024,
+	want := ServiceSpec{
+		Protocol: "tcp",
+		Port:     1024,
+		DestPort: 1024,
 	}
-	got := serviceSpec{}
-	got.fromMessage(&m)
+	got := ServiceSpec{}
+	got.FromMessage(&m)
 	if got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
 }
 
 func TestServiceSpecString(t *testing.T) {
-	s := serviceSpec{
-		protocol: "tcp",
-		port:     1024,
-		destPort: 1024,
+	s := ServiceSpec{
+		Protocol: "tcp",
+		Port:     1024,
+		DestPort: 1024,
 	}
 	want := "tcp:1024:1024"
 	got := s.String()
@@ -58,12 +58,12 @@ func TestServiceSpecString(t *testing.T) {
 
 func TestParseServiceSpec(t *testing.T) {
 	s := "tcp:1024:1024"
-	want := serviceSpec{
-		protocol: "tcp",
-		port:     1024,
-		destPort: 1024,
+	want := ServiceSpec{
+		Protocol: "tcp",
+		Port:     1024,
+		DestPort: 1024,
 	}
-	got := parseServiceSpec(s)
+	got := ParseServiceSpec(s)
 	if *got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}

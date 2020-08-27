@@ -245,9 +245,9 @@ func runClient() {
 		log.Fatal("No services specified")
 	}
 	services := strings.Split(registerServices, ",")
-	var specs []*serviceSpec
+	var specs []*ServiceSpec
 	for _, s := range services {
-		specs = append(specs, parseServiceSpec(s))
+		specs = append(specs, ParseServiceSpec(s))
 	}
 	tlsInfo := ""
 	if tlsConfig != nil {

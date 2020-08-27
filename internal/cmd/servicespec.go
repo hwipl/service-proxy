@@ -9,54 +9,54 @@ import (
 	"github.com/hwipl/service-proxy/internal/network"
 )
 
-// serviceSpec stores the specification of a service
-type serviceSpec struct {
-	protocol string
-	port     uint16
-	destPort uint16
+// ServiceSpec stores the specification of a service
+type ServiceSpec struct {
+	Protocol string
+	Port     uint16
+	DestPort uint16
 }
 
-// toMessage converts a service specification to a message
-func (s *serviceSpec) toMessage() *network.Message {
+// ToMessage converts a service specification to a message
+func (s *ServiceSpec) ToMessage() *network.Message {
 	m := network.Message{
 		Op:       network.MessageAdd,
-		Port:     s.port,
-		DestPort: s.destPort,
+		Port:     s.Port,
+		DestPort: s.DestPort,
 	}
-	switch s.protocol {
+	switch s.Protocol {
 	case "tcp":
 		m.Protocol = network.ProtocolTCP
 	case "udp":
 		m.Protocol = network.ProtocolUDP
 	default:
 		log.Fatalf("unknown protocol \"%s\" in service "+
-			"specification\n", s.protocol)
+			"specification\n", s.Protocol)
 	}
 	return &m
 }
 
-// fromMessage fills this service specification from a message
-func (s *serviceSpec) fromMessage(msg *network.Message) {
-	s.port = msg.Port
-	s.destPort = msg.DestPort
+// FromMessage fills this service specification from a message
+func (s *ServiceSpec) FromMessage(msg *network.Message) {
+	s.Port = msg.Port
+	s.DestPort = msg.DestPort
 	switch msg.Protocol {
 	case network.ProtocolTCP:
-		s.protocol = "tcp"
+		s.Protocol = "tcp"
 	case network.ProtocolUDP:
-		s.protocol = "udp"
+		s.Protocol = "udp"
 	default:
-		s.protocol = "unknown"
+		s.Protocol = "unknown"
 	}
 }
 
 // String converts the service spec to a string
-func (s *serviceSpec) String() string {
-	return fmt.Sprintf("%s:%d:%d", s.protocol, s.port, s.destPort)
+func (s *ServiceSpec) String() string {
+	return fmt.Sprintf("%s:%d:%d", s.Protocol, s.Port, s.DestPort)
 }
 
-// parseServiceSpec parses spec as a service specification with the format
+// ParseServiceSpec parses spec as a service specification with the format
 // "<protocol>:<port>:<destPort>"
-func parseServiceSpec(spec string) *serviceSpec {
+func ParseServiceSpec(spec string) *ServiceSpec {
 	errFmt := "Error parsing service specification %s"
 	parts := strings.Split(spec, ":")
 	if len(parts) != 3 {
@@ -79,10 +79,10 @@ func parseServiceSpec(spec string) *serviceSpec {
 	}
 
 	// return as serviceSpec
-	s := serviceSpec{
-		protocol: protocol,
-		port:     uint16(port),
-		destPort: uint16(destPort),
+	s := ServiceSpec{
+		Protocol: protocol,
+		Port:     uint16(port),
+		DestPort: uint16(destPort),
 	}
 	return &s
 }

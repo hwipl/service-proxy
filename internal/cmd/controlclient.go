@@ -12,7 +12,7 @@ import (
 // controlClient stores control client information
 type controlClient struct {
 	serverAddr *net.TCPAddr
-	specs      []*serviceSpec
+	specs      []*ServiceSpec
 	conn       net.Conn
 }
 
@@ -34,7 +34,7 @@ func (c *controlClient) runClient() {
 	active := 0
 	for _, spec := range c.specs {
 		log.Printf("Sending service registration %s to server", spec)
-		m := spec.toMessage()
+		m := spec.ToMessage()
 		network.WriteToConn(c.conn, m.Serialize())
 
 		// read reply messages from server
@@ -47,15 +47,15 @@ func (c *controlClient) runClient() {
 		msg.Parse(buf)
 
 		// handle message types
-		var spec serviceSpec
+		var spec ServiceSpec
 		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
 		case network.MessageOK:
-			spec.fromMessage(&msg)
+			spec.FromMessage(&msg)
 			log.Printf(replyFmt, &spec, "OK")
 			active++
 		case network.MessageErr:
-			spec.fromMessage(&msg)
+			spec.FromMessage(&msg)
 			log.Printf(replyFmt, &spec, "ERROR")
 		default:
 			// unknown message, stop here
@@ -95,7 +95,7 @@ func (c *controlClient) runClient() {
 }
 
 // runControlClient runs the control client
-func runControlClient(cntrlAddr *net.TCPAddr, specs []*serviceSpec) {
+func runControlClient(cntrlAddr *net.TCPAddr, specs []*ServiceSpec) {
 	c := controlClient{
 		serverAddr: cntrlAddr,
 		specs:      specs,
