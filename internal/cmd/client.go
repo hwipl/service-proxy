@@ -108,7 +108,7 @@ func (c *client) handleAddMsg(msg *network.Message) bool {
 	}
 
 	// send result back to client
-	if !WriteToConn(c.conn, msg.Serialize()) {
+	if !network.WriteToConn(c.conn, msg.Serialize()) {
 		return false
 	}
 	return true
@@ -167,19 +167,6 @@ func (c *client) stopClient() {
 		s.stopService()
 		udpServices.del(port)
 	}
-}
-
-// WriteToConn writes buf to conn
-func WriteToConn(conn net.Conn, buf []byte) bool {
-	count := 0
-	for count < len(buf) {
-		n, err := conn.Write(buf[count:])
-		if err != nil {
-			return false
-		}
-		count += n
-	}
-	return true
 }
 
 // handleClient handles the client with its control connection conn

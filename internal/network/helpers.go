@@ -34,3 +34,17 @@ func ReadFromConn(conn net.Conn) []byte {
 	}
 	return buf
 }
+
+// WriteToConn writes buf to conn
+// TODO: merge with TCPWriteToConn?
+func WriteToConn(conn net.Conn, buf []byte) bool {
+	count := 0
+	for count < len(buf) {
+		n, err := conn.Write(buf[count:])
+		if err != nil {
+			return false
+		}
+		count += n
+	}
+	return true
+}
