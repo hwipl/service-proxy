@@ -1,6 +1,10 @@
 package cmd
 
-import "net"
+import (
+	"net"
+
+	"github.com/hwipl/service-proxy/internal/network"
+)
 
 // tcpForwarder forwards network traffic between a tcp service proxy and
 // its destination
@@ -32,7 +36,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from service peer to destination
-			TCPWriteToConn(t.dstConn, data)
+			network.TCPWriteToConn(t.dstConn, data)
 		case data, more := <-t.dstData:
 			if !more {
 				// no more data from destination connection,
@@ -45,7 +49,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from destination to service peer
-			TCPWriteToConn(t.srvConn, data)
+			network.TCPWriteToConn(t.srvConn, data)
 		}
 
 		// if both channels are closed, stop
@@ -72,20 +76,6 @@ func tcpReadToChannel(conn net.Conn, channel chan<- []byte) {
 			break
 		}
 	}
-}
-
-// TCPWriteToConn writes data to conn
-func TCPWriteToConn(conn net.Conn, data []byte) bool {
-	count := 0
-	for count < len(data) {
-		n, err := conn.Write(data[count:])
-		if err != nil {
-			// do more in this case? abort connection?
-			return false
-		}
-		count += n
-	}
-	return true
 }
 
 // runTCPForwarder starts forwarding traffic between a connection to the
