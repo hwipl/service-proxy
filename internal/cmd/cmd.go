@@ -117,9 +117,8 @@ func parseAllowedPort(port string) {
 	getMax := func() string {
 		if len(minmax) == 2 {
 			return minmax[1]
-		} else {
-			return minmax[0]
 		}
+		return minmax[0]
 	}
 	max, err := strconv.ParseUint(getMax(), 10, 16)
 	if err != nil {
