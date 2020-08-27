@@ -13,6 +13,7 @@ import (
 // controlClient stores control client information
 type controlClient struct {
 	serverAddr *net.TCPAddr
+	tlsConfig  *tls.Config
 	specs      []*pclient.ServiceSpec
 	conn       net.Conn
 }
@@ -25,8 +26,8 @@ func (c *controlClient) runClient() {
 		log.Fatal(err)
 	}
 	c.conn = conn
-	if tlsConfig != nil {
-		c.conn = tls.Client(conn, tlsConfig)
+	if c.tlsConfig != nil {
+		c.conn = tls.Client(conn, c.tlsConfig)
 	}
 	defer c.conn.Close()
 	log.Println("Connected to server", c.serverAddr)
@@ -96,9 +97,11 @@ func (c *controlClient) runClient() {
 }
 
 // RunControlClient runs the control client
-func RunControlClient(cntrlAddr *net.TCPAddr, specs []*pclient.ServiceSpec) {
+func RunControlClient(cntrlAddr *net.TCPAddr, tlsConfig *tls.Config,
+	specs []*pclient.ServiceSpec) {
 	c := controlClient{
 		serverAddr: cntrlAddr,
+		tlsConfig:  tlsConfig,
 		specs:      specs,
 	}
 	c.runClient()
