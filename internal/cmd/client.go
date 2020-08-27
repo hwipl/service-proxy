@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"github.com/hwipl/service-proxy/internal/network"
 )
 
 // client stores control client information
@@ -35,7 +37,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(ProtocolTCP, uint16(port)) {
+	if !allowedPortRanges.containsPort(network.ProtocolTCP, uint16(port)) {
 		log.Printf("Could not create tcp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -68,7 +70,7 @@ func (c *client) addUDPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(ProtocolUDP, uint16(port)) {
+	if !allowedPortRanges.containsPort(network.ProtocolUDP, uint16(port)) {
 		log.Printf("Could not create udp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -86,9 +88,9 @@ func (c *client) addUDPService(port, destPort int) bool {
 func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 	// start service
 	switch protocol {
-	case ProtocolTCP:
+	case network.ProtocolTCP:
 		return c.addTCPService(int(port), int(destPort))
-	case ProtocolUDP:
+	case network.ProtocolUDP:
 		return c.addUDPService(int(port), int(destPort))
 	default:
 		// unknown protocol, stop here
@@ -97,12 +99,12 @@ func (c *client) addService(protocol uint8, port, destPort uint16) bool {
 }
 
 // handleAddMsg handles the client's add message
-func (c *client) handleAddMsg(msg *Message) bool {
+func (c *client) handleAddMsg(msg *network.Message) bool {
 	// try to add service
 	if ok := c.addService(msg.Protocol, msg.Port, msg.DestPort); ok {
-		msg.Op = MessageOK
+		msg.Op = network.MessageOK
 	} else {
-		msg.Op = MessageErr
+		msg.Op = network.MessageErr
 	}
 
 	// send result back to client
@@ -119,7 +121,7 @@ func (c *client) handleClient() {
 	for {
 		// read a message from the connection and parse it; if there is
 		// no message within 30s, assume client is dead and stop
-		var msg Message
+		var msg network.Message
 		c.conn.SetDeadline(time.Now().Add(30 * time.Second))
 		buf := readFromConn(c.conn)
 		if buf == nil {
@@ -130,13 +132,13 @@ func (c *client) handleClient() {
 
 		// handle message types
 		switch msg.Op {
-		case MessageAdd:
+		case network.MessageAdd:
 			if !c.handleAddMsg(&msg) {
 				return
 			}
-		case MessageDel:
+		case network.MessageDel:
 			// not implemented
-		case MessageNop:
+		case network.MessageNop:
 			// just ignore NOP
 		default:
 			// unknown message, stop here
@@ -169,9 +171,9 @@ func (c *client) stopClient() {
 
 // readFromConn reads messageLen bytes from conn
 func readFromConn(conn net.Conn) []byte {
-	buf := make([]byte, MessageLen)
+	buf := make([]byte, network.MessageLen)
 	count := 0
-	for count < MessageLen {
+	for count < network.MessageLen {
 		n, err := conn.Read(buf[count:])
 		if err != nil {
 			log.Printf("Connection to %s: %s\n",

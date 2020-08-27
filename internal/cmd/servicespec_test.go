@@ -1,6 +1,10 @@
 package cmd
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/hwipl/service-proxy/internal/network"
+)
 
 func TestServiceSpecToMessage(t *testing.T) {
 	s := serviceSpec{
@@ -8,9 +12,9 @@ func TestServiceSpecToMessage(t *testing.T) {
 		port:     1024,
 		destPort: 1024,
 	}
-	want := Message{
-		Op:       MessageAdd,
-		Protocol: ProtocolTCP,
+	want := network.Message{
+		Op:       network.MessageAdd,
+		Protocol: network.ProtocolTCP,
 		Port:     1024,
 		DestPort: 1024,
 	}
@@ -21,9 +25,9 @@ func TestServiceSpecToMessage(t *testing.T) {
 }
 
 func TestServiceSpecFromMessage(t *testing.T) {
-	m := Message{
-		Op:       MessageAdd,
-		Protocol: ProtocolTCP,
+	m := network.Message{
+		Op:       network.MessageAdd,
+		Protocol: network.ProtocolTCP,
 		Port:     1024,
 		DestPort: 1024,
 	}

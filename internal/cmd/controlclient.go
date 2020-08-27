@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"github.com/hwipl/service-proxy/internal/network"
 )
 
 // controlClient stores control client information
@@ -36,7 +38,7 @@ func (c *controlClient) runClient() {
 		tcpWriteToConn(c.conn, m.Serialize())
 
 		// read reply messages from server
-		var msg Message
+		var msg network.Message
 		buf := readFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to server")
@@ -48,11 +50,11 @@ func (c *controlClient) runClient() {
 		var spec serviceSpec
 		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
-		case MessageOK:
+		case network.MessageOK:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "OK")
 			active++
-		case MessageErr:
+		case network.MessageErr:
 			spec.fromMessage(&msg)
 			log.Printf(replyFmt, &spec, "ERROR")
 		default:
@@ -77,7 +79,7 @@ func (c *controlClient) runClient() {
 		for {
 			// send a keep-alive/NOP message every 15 seconds
 			time.Sleep(15 * time.Second)
-			keepAlive := Message{Op: MessageNop}
+			keepAlive := network.Message{Op: network.MessageNop}
 			if !tcpWriteToConn(c.conn, keepAlive.Serialize()) {
 				return
 			}

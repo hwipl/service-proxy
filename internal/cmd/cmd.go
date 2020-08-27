@@ -10,6 +10,8 @@ import (
 	"net"
 	"strconv"
 	"strings"
+
+	"github.com/hwipl/service-proxy/internal/network"
 )
 
 const (
@@ -95,9 +97,9 @@ func parseAllowedPort(port string) {
 	protocol := uint8(0)
 	switch protPorts[0] {
 	case "tcp":
-		protocol = ProtocolTCP
+		protocol = network.ProtocolTCP
 	case "udp":
-		protocol = ProtocolUDP
+		protocol = network.ProtocolUDP
 	default:
 		log.Fatal("unknown protocol in allowed port: ", port)
 	}

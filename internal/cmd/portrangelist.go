@@ -1,6 +1,10 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/hwipl/service-proxy/internal/network"
+)
 
 var (
 	allowedPortRanges portRangeList
@@ -45,9 +49,9 @@ func (p *portRange) String() string {
 
 	// convert protocol number to a string if possible
 	switch p.protocol {
-	case ProtocolTCP:
+	case network.ProtocolTCP:
 		protocol = "tcp"
-	case ProtocolUDP:
+	case network.ProtocolUDP:
 		protocol = "udp"
 	default:
 		protocol = fmt.Sprintf("%d", p.protocol)

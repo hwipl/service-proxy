@@ -5,6 +5,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/hwipl/service-proxy/internal/network"
 )
 
 // serviceSpec stores the specification of a service
@@ -15,17 +17,17 @@ type serviceSpec struct {
 }
 
 // toMessage converts a service specification to a message
-func (s *serviceSpec) toMessage() *Message {
-	m := Message{
-		Op:       MessageAdd,
+func (s *serviceSpec) toMessage() *network.Message {
+	m := network.Message{
+		Op:       network.MessageAdd,
 		Port:     s.port,
 		DestPort: s.destPort,
 	}
 	switch s.protocol {
 	case "tcp":
-		m.Protocol = ProtocolTCP
+		m.Protocol = network.ProtocolTCP
 	case "udp":
-		m.Protocol = ProtocolUDP
+		m.Protocol = network.ProtocolUDP
 	default:
 		log.Fatalf("unknown protocol \"%s\" in service "+
 			"specification\n", s.protocol)
@@ -34,13 +36,13 @@ func (s *serviceSpec) toMessage() *Message {
 }
 
 // fromMessage fills this service specification from a message
-func (s *serviceSpec) fromMessage(msg *Message) {
+func (s *serviceSpec) fromMessage(msg *network.Message) {
 	s.port = msg.Port
 	s.destPort = msg.DestPort
 	switch msg.Protocol {
-	case ProtocolTCP:
+	case network.ProtocolTCP:
 		s.protocol = "tcp"
-	case ProtocolUDP:
+	case network.ProtocolUDP:
 		s.protocol = "udp"
 	default:
 		s.protocol = "unknown"

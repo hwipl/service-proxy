@@ -3,6 +3,8 @@ package cmd
 import (
 	"reflect"
 	"testing"
+
+	"github.com/hwipl/service-proxy/internal/network"
 )
 
 func TestPortRangeListAdd(t *testing.T) {
@@ -19,8 +21,8 @@ func TestPortRangeListAdd(t *testing.T) {
 	}
 
 	// add single ports
-	ports.add(ProtocolTCP, 1024, 1024)
-	ports.add(ProtocolUDP, 1024, 1024)
+	ports.add(network.ProtocolTCP, 1024, 1024)
+	ports.add(network.ProtocolUDP, 1024, 1024)
 
 	want = []string{
 		"tcp:1024-1024",
@@ -30,8 +32,8 @@ func TestPortRangeListAdd(t *testing.T) {
 
 	// add port ranges
 	ports = portRangeList{}
-	ports.add(ProtocolTCP, 1024, 65535)
-	ports.add(ProtocolUDP, 1024, 65535)
+	ports.add(network.ProtocolTCP, 1024, 65535)
+	ports.add(network.ProtocolUDP, 1024, 65535)
 
 	want = []string{
 		"tcp:1024-65535",
@@ -41,9 +43,9 @@ func TestPortRangeListAdd(t *testing.T) {
 
 	// add port ranges containing each other, size increasing
 	ports = portRangeList{}
-	ports.add(ProtocolTCP, 4096, 8192)
-	ports.add(ProtocolTCP, 2048, 16384)
-	ports.add(ProtocolTCP, 1024, 32768)
+	ports.add(network.ProtocolTCP, 4096, 8192)
+	ports.add(network.ProtocolTCP, 2048, 16384)
+	ports.add(network.ProtocolTCP, 1024, 32768)
 
 	want = []string{
 		"tcp:1024-32768",
@@ -52,9 +54,9 @@ func TestPortRangeListAdd(t *testing.T) {
 
 	// add port ranges containing each other, size decreasing
 	ports = portRangeList{}
-	ports.add(ProtocolTCP, 1024, 32768)
-	ports.add(ProtocolTCP, 2048, 16384)
-	ports.add(ProtocolTCP, 4096, 8192)
+	ports.add(network.ProtocolTCP, 1024, 32768)
+	ports.add(network.ProtocolTCP, 2048, 16384)
+	ports.add(network.ProtocolTCP, 4096, 8192)
 
 	want = []string{
 		"tcp:1024-32768",
@@ -63,11 +65,11 @@ func TestPortRangeListAdd(t *testing.T) {
 
 	// add overlapping port ranges
 	ports = portRangeList{}
-	ports.add(ProtocolTCP, 4096, 8192)
-	ports.add(ProtocolTCP, 16384, 32768)
-	ports.add(ProtocolTCP, 2048, 4096)
-	ports.add(ProtocolTCP, 8192, 16384)
-	ports.add(ProtocolTCP, 1024, 2048)
+	ports.add(network.ProtocolTCP, 4096, 8192)
+	ports.add(network.ProtocolTCP, 16384, 32768)
+	ports.add(network.ProtocolTCP, 2048, 4096)
+	ports.add(network.ProtocolTCP, 8192, 16384)
+	ports.add(network.ProtocolTCP, 1024, 2048)
 
 	want = []string{
 		"tcp:1024-32768",
@@ -79,14 +81,14 @@ func TestPortRangeListContainsPort(t *testing.T) {
 	var want, got bool
 	var ports portRangeList
 	var test = func(port uint16) {
-		got = ports.containsPort(ProtocolTCP, port)
+		got = ports.containsPort(network.ProtocolTCP, port)
 		if got != want {
 			t.Errorf("port %d: got %t, want %t", port, got, want)
 		}
 	}
 
 	// prepare port range list
-	ports.add(ProtocolTCP, 1024, 4096)
+	ports.add(network.ProtocolTCP, 1024, 4096)
 
 	// test port not in range
 	want = false
@@ -120,9 +122,9 @@ func TestPortRangeListGetAll(t *testing.T) {
 	test()
 
 	// test filled
-	ports.add(ProtocolTCP, 1024, 2048)
-	ports.add(ProtocolTCP, 4096, 8192)
-	ports.add(ProtocolTCP, 16384, 32768)
+	ports.add(network.ProtocolTCP, 1024, 2048)
+	ports.add(network.ProtocolTCP, 4096, 8192)
+	ports.add(network.ProtocolTCP, 16384, 32768)
 
 	want = "tcp:1024-2048 tcp:4096-8192 tcp:16384-32768"
 	test()
