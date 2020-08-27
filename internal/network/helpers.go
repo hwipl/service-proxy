@@ -1,6 +1,9 @@
 package network
 
-import "net"
+import (
+	"log"
+	"net"
+)
 
 // TCPWriteToConn writes data to conn
 func TCPWriteToConn(conn net.Conn, data []byte) bool {
@@ -14,4 +17,20 @@ func TCPWriteToConn(conn net.Conn, data []byte) bool {
 		count += n
 	}
 	return true
+}
+
+// ReadFromConn reads messageLen bytes from conn
+func ReadFromConn(conn net.Conn) []byte {
+	buf := make([]byte, MessageLen)
+	count := 0
+	for count < MessageLen {
+		n, err := conn.Read(buf[count:])
+		if err != nil {
+			log.Printf("Connection to %s: %s\n",
+				conn.RemoteAddr(), err)
+			return nil
+		}
+		count += n
+	}
+	return buf
 }

@@ -123,7 +123,7 @@ func (c *client) handleClient() {
 		// no message within 30s, assume client is dead and stop
 		var msg network.Message
 		c.conn.SetDeadline(time.Now().Add(30 * time.Second))
-		buf := ReadFromConn(c.conn)
+		buf := network.ReadFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to client", c.addr)
 			return
@@ -167,22 +167,6 @@ func (c *client) stopClient() {
 		s.stopService()
 		udpServices.del(port)
 	}
-}
-
-// ReadFromConn reads messageLen bytes from conn
-func ReadFromConn(conn net.Conn) []byte {
-	buf := make([]byte, network.MessageLen)
-	count := 0
-	for count < network.MessageLen {
-		n, err := conn.Read(buf[count:])
-		if err != nil {
-			log.Printf("Connection to %s: %s\n",
-				conn.RemoteAddr(), err)
-			return nil
-		}
-		count += n
-	}
-	return buf
 }
 
 // writeToConn writes buf to conn

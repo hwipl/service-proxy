@@ -62,7 +62,7 @@ func TestTCPForwarder(t *testing.T) {
 	var want, got []byte
 	want = []byte{1, 2, 3, 4, 5, 6}
 	network.TCPWriteToConn(srvConn, want)
-	got = ReadFromConn(dstClient)
+	got = network.ReadFromConn(dstClient)
 
 	if bytes.Compare(got, want) != 0 {
 		t.Errorf("got %v, want %v", got, want)
@@ -71,7 +71,7 @@ func TestTCPForwarder(t *testing.T) {
 	// test writing to destination connection and reading from service
 	want = []byte{6, 5, 4, 3, 2, 1}
 	network.TCPWriteToConn(dstClient, want)
-	got = ReadFromConn(srvConn)
+	got = network.ReadFromConn(srvConn)
 
 	if bytes.Compare(got, want) != 0 {
 		t.Errorf("got %v, want %v", got, want)
