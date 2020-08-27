@@ -39,7 +39,7 @@ func (c *controlClient) runClient() {
 
 		// read reply messages from server
 		var msg network.Message
-		buf := readFromConn(c.conn)
+		buf := ReadFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to server")
 			return
@@ -87,7 +87,7 @@ func (c *controlClient) runClient() {
 		}
 	}()
 	for {
-		if readFromConn(c.conn) == nil {
+		if ReadFromConn(c.conn) == nil {
 			log.Println("Closing connection to server")
 			return
 		}

@@ -123,7 +123,7 @@ func (c *client) handleClient() {
 		// no message within 30s, assume client is dead and stop
 		var msg network.Message
 		c.conn.SetDeadline(time.Now().Add(30 * time.Second))
-		buf := readFromConn(c.conn)
+		buf := ReadFromConn(c.conn)
 		if buf == nil {
 			log.Println("Closing connection to client", c.addr)
 			return
@@ -169,8 +169,8 @@ func (c *client) stopClient() {
 	}
 }
 
-// readFromConn reads messageLen bytes from conn
-func readFromConn(conn net.Conn) []byte {
+// ReadFromConn reads messageLen bytes from conn
+func ReadFromConn(conn net.Conn) []byte {
 	buf := make([]byte, network.MessageLen)
 	count := 0
 	for count < network.MessageLen {
