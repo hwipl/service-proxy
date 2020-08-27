@@ -36,7 +36,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from service peer to destination
-			network.TCPWriteToConn(t.dstConn, data)
+			network.WriteToConn(t.dstConn, data)
 		case data, more := <-t.dstData:
 			if !more {
 				// no more data from destination connection,
@@ -49,7 +49,7 @@ func (t *tcpForwarder) runForwarder() {
 				break
 			}
 			// copy data from destination to service peer
-			network.TCPWriteToConn(t.srvConn, data)
+			network.WriteToConn(t.srvConn, data)
 		}
 
 		// if both channels are closed, stop

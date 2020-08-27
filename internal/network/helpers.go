@@ -5,20 +5,6 @@ import (
 	"net"
 )
 
-// TCPWriteToConn writes data to conn
-func TCPWriteToConn(conn net.Conn, data []byte) bool {
-	count := 0
-	for count < len(data) {
-		n, err := conn.Write(data[count:])
-		if err != nil {
-			// do more in this case? abort connection?
-			return false
-		}
-		count += n
-	}
-	return true
-}
-
 // ReadFromConn reads messageLen bytes from conn
 func ReadFromConn(conn net.Conn) []byte {
 	buf := make([]byte, MessageLen)
@@ -36,12 +22,12 @@ func ReadFromConn(conn net.Conn) []byte {
 }
 
 // WriteToConn writes buf to conn
-// TODO: merge with TCPWriteToConn?
 func WriteToConn(conn net.Conn, buf []byte) bool {
 	count := 0
 	for count < len(buf) {
 		n, err := conn.Write(buf[count:])
 		if err != nil {
+			// do more in this case? abort connection?
 			return false
 		}
 		count += n

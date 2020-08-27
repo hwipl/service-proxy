@@ -35,7 +35,7 @@ func (c *controlClient) runClient() {
 	for _, spec := range c.specs {
 		log.Printf("Sending service registration %s to server", spec)
 		m := spec.toMessage()
-		network.TCPWriteToConn(c.conn, m.Serialize())
+		network.WriteToConn(c.conn, m.Serialize())
 
 		// read reply messages from server
 		var msg network.Message
@@ -80,7 +80,7 @@ func (c *controlClient) runClient() {
 			// send a keep-alive/NOP message every 15 seconds
 			time.Sleep(15 * time.Second)
 			keepAlive := network.Message{Op: network.MessageNop}
-			if !network.TCPWriteToConn(c.conn,
+			if !network.WriteToConn(c.conn,
 				keepAlive.Serialize()) {
 				return
 			}
