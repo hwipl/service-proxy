@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/hwipl/service-proxy/internal/network"
+	"github.com/hwipl/service-proxy/internal/pclient"
 )
 
 const (
@@ -245,9 +246,9 @@ func runClient() {
 		log.Fatal("No services specified")
 	}
 	services := strings.Split(registerServices, ",")
-	var specs []*ServiceSpec
+	var specs []*pclient.ServiceSpec
 	for _, s := range services {
-		specs = append(specs, ParseServiceSpec(s))
+		specs = append(specs, pclient.ParseServiceSpec(s))
 	}
 	tlsInfo := ""
 	if tlsConfig != nil {

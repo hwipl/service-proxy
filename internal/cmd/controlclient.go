@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/hwipl/service-proxy/internal/network"
+	"github.com/hwipl/service-proxy/internal/pclient"
 )
 
 // controlClient stores control client information
 type controlClient struct {
 	serverAddr *net.TCPAddr
-	specs      []*ServiceSpec
+	specs      []*pclient.ServiceSpec
 	conn       net.Conn
 }
 
@@ -47,7 +48,7 @@ func (c *controlClient) runClient() {
 		msg.Parse(buf)
 
 		// handle message types
-		var spec ServiceSpec
+		var spec pclient.ServiceSpec
 		replyFmt := "Server reply: service registration %s %s\n"
 		switch msg.Op {
 		case network.MessageOK:
@@ -95,7 +96,7 @@ func (c *controlClient) runClient() {
 }
 
 // runControlClient runs the control client
-func runControlClient(cntrlAddr *net.TCPAddr, specs []*ServiceSpec) {
+func runControlClient(cntrlAddr *net.TCPAddr, specs []*pclient.ServiceSpec) {
 	c := controlClient{
 		serverAddr: cntrlAddr,
 		specs:      specs,
