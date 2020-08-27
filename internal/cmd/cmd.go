@@ -257,7 +257,7 @@ func runClient() {
 		tlsInfo, ip, cntrlAddr.Port)
 
 	// connect to server and configure services
-	runControlClient(cntrlAddr, specs)
+	RunControlClient(cntrlAddr, specs)
 }
 
 // parseCommandLine parses the command line arguments

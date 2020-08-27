@@ -95,8 +95,8 @@ func (c *controlClient) runClient() {
 	}
 }
 
-// runControlClient runs the control client
-func runControlClient(cntrlAddr *net.TCPAddr, specs []*pclient.ServiceSpec) {
+// RunControlClient runs the control client
+func RunControlClient(cntrlAddr *net.TCPAddr, specs []*pclient.ServiceSpec) {
 	c := controlClient{
 		serverAddr: cntrlAddr,
 		specs:      specs,
