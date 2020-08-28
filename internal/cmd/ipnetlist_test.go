@@ -16,7 +16,7 @@ func testStringsToIPNetList(nets ...string) *ipNetList {
 		if err != nil {
 			log.Fatal(err)
 		}
-		ipList.add(ipNet)
+		ipList.addIPNet(ipNet)
 	}
 	return &ipList
 }
@@ -29,7 +29,7 @@ func testIPNetListToStrings(ipList *ipNetList) []string {
 	return s
 }
 
-func TestIPNetListAdd(t *testing.T) {
+func TestIPNetListAddIPNet(t *testing.T) {
 	var addrs, want, got []string
 	test := func() {
 		got = testIPNetListToStrings(testStringsToIPNetList(addrs...))
@@ -123,5 +123,30 @@ func TestIPNetListGetAll(t *testing.T) {
 	wantStrings := addrs
 	if !reflect.DeepEqual(gotStrings, wantStrings) {
 		t.Errorf("got %s, want %s", gotStrings, wantStrings)
+	}
+}
+
+func TestIPNetListAdd(t *testing.T) {
+	var ipList ipNetList
+
+	ipList.add("127.0.0.1")
+	ipList.add("192.168.1.0/24")
+	ipList.add("2000::1")
+	ipList.add("fe80::1/64")
+
+	want := "127.0.0.1/32\n" +
+		"192.168.1.0/24\n" +
+		"2000::1/128\n" +
+		"fe80::/64"
+	got := ""
+	for i, n := range ipList.getAll() {
+		if i > 0 {
+			got += "\n"
+		}
+		got += n.String()
+	}
+
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
 	}
 }

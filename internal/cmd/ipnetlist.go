@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"net"
 )
 
@@ -14,7 +15,7 @@ type ipNetList struct {
 }
 
 // add adds ip network ipNet to the list
-func (i *ipNetList) add(ipNet *net.IPNet) {
+func (i *ipNetList) addIPNet(ipNet *net.IPNet) {
 	// check if there is an existing entry that contains the new ip
 	// network, or if existing ip network entries should be replaced by
 	// the new one
@@ -61,4 +62,27 @@ func (i *ipNetList) containsIP(ip net.IP) bool {
 // getAll returns the list of ip networks
 func (i *ipNetList) getAll() []*net.IPNet {
 	return i.l
+}
+
+// add converts the string addr to an ip network and adds it to the list
+func (i *ipNetList) add(addr string) {
+	// check if it is a cidr address
+	ip, ipNet, err := net.ParseCIDR(addr)
+	if err != nil {
+		// not cidr, check if we can parse it as regular ip
+		ip = net.ParseIP(addr)
+		if ip == nil {
+			log.Fatal("cannot parse allowed IP: ", addr)
+		}
+		// create ip net
+		netmask := net.CIDRMask(32, 32)
+		if ip.To4() == nil { // ipv6 address
+			netmask = net.CIDRMask(128, 128)
+		}
+		ipNet = &net.IPNet{
+			IP:   ip,
+			Mask: netmask,
+		}
+	}
+	i.addIPNet(ipNet)
 }

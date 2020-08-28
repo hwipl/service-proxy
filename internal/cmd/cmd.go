@@ -63,28 +63,6 @@ func parseTCPAddr(addr string) *net.TCPAddr {
 	return cntrlAddr
 }
 
-func parseAllowedIP(addr string) {
-	// check if it is a cidr address
-	ip, ipNet, err := net.ParseCIDR(addr)
-	if err != nil {
-		// not cidr, check if we can parse it as regular ip
-		ip = net.ParseIP(addr)
-		if ip == nil {
-			log.Fatal("cannot parse allowed IP: ", addr)
-		}
-		// create ip net
-		netmask := net.CIDRMask(32, 32)
-		if ip.To4() == nil { // ipv6 address
-			netmask = net.CIDRMask(128, 128)
-		}
-		ipNet = &net.IPNet{
-			IP:   ip,
-			Mask: netmask,
-		}
-	}
-	allowedIPNets.add(ipNet)
-}
-
 func parseAllowedPort(port string) {
 	// get protocol and port range
 	protPorts := strings.Split(port, ":")
@@ -171,7 +149,7 @@ func runServer() {
 	if allowedIPs != "" {
 		aIP := strings.Split(allowedIPs, ",")
 		for _, a := range aIP {
-			parseAllowedIP(a)
+			allowedIPNets.add(a)
 		}
 	}
 
