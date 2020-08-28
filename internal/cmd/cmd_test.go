@@ -4,8 +4,32 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 	"testing"
 )
+
+func TestParseTCPAddr(t *testing.T) {
+	var want, got []string
+
+	addrs := []string{
+		"127.0.0.1",
+		"192.168.1.1:3232",
+		"::1",
+		"[2000::1]:2323",
+	}
+	want = []string{
+		"127.0.0.1:32323",
+		"192.168.1.1:3232",
+		"[::1]:32323",
+		"[2000::1]:2323",
+	}
+	for _, i := range addrs {
+		got = append(got, parseTCPAddr(i).String())
+	}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
 
 func TestParseAllowedPort(t *testing.T) {
 	parseAllowedPort("udp:1024")
