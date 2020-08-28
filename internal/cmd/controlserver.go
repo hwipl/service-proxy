@@ -10,10 +10,11 @@ import (
 
 // controlServer stores controlServer server information
 type controlServer struct {
-	addr       *net.TCPAddr
-	tlsConfig  *tls.Config
-	listener   *net.TCPListener
-	allowedIPs ipNetList
+	addr         *net.TCPAddr
+	tlsConfig    *tls.Config
+	listener     *net.TCPListener
+	allowedIPs   ipNetList
+	allowedPorts portRangeList
 }
 
 // runServer runs the control server
@@ -42,7 +43,7 @@ func (c *controlServer) runServer() {
 		}
 
 		// handle client connection
-		handleClient(conn, c.tlsConfig, c.addr.IP)
+		handleClient(conn, c.tlsConfig, c.addr.IP, c.allowedPorts)
 	}
 }
 
@@ -67,7 +68,7 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 	if allowedPorts != "" {
 		aPorts := strings.Split(allowedPorts, ",")
 		for _, a := range aPorts {
-			allowedPortRanges.add(a)
+			c.allowedPorts.add(a)
 		}
 	}
 
@@ -85,7 +86,7 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 	for _, ipNet := range c.allowedIPs.getAll() {
 		log.Printf("Allowing control connections from %s\n", ipNet)
 	}
-	for _, portRange := range allowedPortRanges.getAll() {
+	for _, portRange := range c.allowedPorts.getAll() {
 		log.Printf("Allowing port range %s in service registrations\n",
 			portRange)
 	}

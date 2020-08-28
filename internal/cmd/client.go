@@ -15,9 +15,10 @@ type client struct {
 	addr  *net.TCPAddr
 	laddr *net.TCPAddr
 	// serverIP is the IP address the server runs services on
-	serverIP net.IP
-	tcpPorts map[int]bool
-	udpPorts map[int]bool
+	serverIP     net.IP
+	tcpPorts     map[int]bool
+	udpPorts     map[int]bool
+	allowedPorts portRangeList
 }
 
 // addTCPService adds a tcp service to the client
@@ -39,7 +40,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(network.ProtocolTCP, uint16(port)) {
+	if !c.allowedPorts.containsPort(network.ProtocolTCP, uint16(port)) {
 		log.Printf("Could not create tcp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -72,7 +73,7 @@ func (c *client) addUDPService(port, destPort int) bool {
 	}
 
 	// check if port is allowed
-	if !allowedPortRanges.containsPort(network.ProtocolUDP, uint16(port)) {
+	if !c.allowedPorts.containsPort(network.ProtocolUDP, uint16(port)) {
 		log.Printf("Could not create udp service %s<->%s: "+
 			"port not allowed\n", &srvAddr, &dstAddr)
 		return false
@@ -172,14 +173,16 @@ func (c *client) stopClient() {
 }
 
 // handleClient handles the client with its control connection conn
-func handleClient(conn net.Conn, tlsConfig *tls.Config, serverIP net.IP) {
+func handleClient(conn net.Conn, tlsConfig *tls.Config, serverIP net.IP,
+	allowedPorts portRangeList) {
 	c := client{
-		conn:     conn,
-		addr:     conn.RemoteAddr().(*net.TCPAddr),
-		laddr:    conn.LocalAddr().(*net.TCPAddr),
-		serverIP: serverIP,
-		tcpPorts: make(map[int]bool),
-		udpPorts: make(map[int]bool),
+		conn:         conn,
+		addr:         conn.RemoteAddr().(*net.TCPAddr),
+		laddr:        conn.LocalAddr().(*net.TCPAddr),
+		serverIP:     serverIP,
+		tcpPorts:     make(map[int]bool),
+		udpPorts:     make(map[int]bool),
+		allowedPorts: allowedPorts,
 	}
 	tlsInfo := ""
 	if tlsConfig != nil {

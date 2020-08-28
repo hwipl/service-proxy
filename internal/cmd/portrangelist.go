@@ -9,10 +9,6 @@ import (
 	"github.com/hwipl/service-proxy/internal/network"
 )
 
-var (
-	allowedPortRanges portRangeList
-)
-
 // portRange specifies a port range for a specific protocol
 type portRange struct {
 	protocol uint8
