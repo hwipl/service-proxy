@@ -43,8 +43,6 @@ var (
 	keyFile = ""
 	// caCertFiles is a comma-separated list of ca-certificate files
 	caCertFiles = ""
-	// tlsConfig contains the tls config
-	tlsConfig *tls.Config
 )
 
 func parseTCPAddr(addr string) *net.TCPAddr {
@@ -186,6 +184,7 @@ func runServer() {
 	}
 
 	// parse certificates
+	var tlsConfig *tls.Config
 	if certFile != "" {
 		cert := parseCertFiles()
 		tlsConfig = &tls.Config{
@@ -227,6 +226,7 @@ func runClient() {
 	}
 
 	// parse certificates
+	var tlsConfig *tls.Config
 	if certFile != "" {
 		cert := parseCertFiles()
 		tlsConfig = &tls.Config{
