@@ -5,14 +5,14 @@ import (
 	"net"
 )
 
-// control stores control server information
-type control struct {
+// controlServer stores controlServer server information
+type controlServer struct {
 	addr     *net.TCPAddr
 	listener *net.TCPListener
 }
 
-// runControl runs the control server
-func (c *control) runControl() {
+// runServer runs the control server
+func (c *controlServer) runServer() {
 	// start control socket
 	listener, err := net.ListenTCP("tcp", c.addr)
 	if err != nil {
@@ -41,13 +41,13 @@ func (c *control) runControl() {
 	}
 }
 
-// RunControl runs the control server on addr
-func RunControl(addr *net.TCPAddr) {
+// RunControlServer runs the control server on addr
+func RunControlServer(addr *net.TCPAddr) {
 	// create control server
-	c := control{
+	c := controlServer{
 		addr: addr,
 	}
 
 	// run control server
-	c.runControl()
+	c.runServer()
 }

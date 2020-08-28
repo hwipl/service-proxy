@@ -212,7 +212,7 @@ func runServer() {
 		log.Printf("Allowing port range %s in service registrations\n",
 			portRange)
 	}
-	RunControl(cntrlAddr)
+	RunControlServer(cntrlAddr)
 }
 
 // run in client mode
