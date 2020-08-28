@@ -41,7 +41,7 @@ func (c *controlServer) runServer() {
 		}
 
 		// handle client connection
-		handleClient(conn, c.tlsConfig)
+		handleClient(conn, c.tlsConfig, c.addr.IP)
 	}
 }
 

@@ -11,9 +11,11 @@ import (
 
 // client stores control client information
 type client struct {
-	conn     net.Conn
-	addr     *net.TCPAddr
-	laddr    *net.TCPAddr
+	conn  net.Conn
+	addr  *net.TCPAddr
+	laddr *net.TCPAddr
+	// serverIP is the IP address the server runs services on
+	serverIP net.IP
 	tcpPorts map[int]bool
 	udpPorts map[int]bool
 }
@@ -25,7 +27,7 @@ func (c *client) addTCPService(port, destPort int) bool {
 
 	// create tcp addresses
 	srvAddr := net.TCPAddr{
-		IP:   serverIP,
+		IP:   c.serverIP,
 		Port: port,
 	}
 	srcAddr := net.TCPAddr{
@@ -58,7 +60,7 @@ func (c *client) addUDPService(port, destPort int) bool {
 
 	// create udp addresses
 	srvAddr := net.UDPAddr{
-		IP:   serverIP,
+		IP:   c.serverIP,
 		Port: port,
 	}
 	srcAddr := net.UDPAddr{
@@ -170,11 +172,12 @@ func (c *client) stopClient() {
 }
 
 // handleClient handles the client with its control connection conn
-func handleClient(conn net.Conn, tlsConfig *tls.Config) {
+func handleClient(conn net.Conn, tlsConfig *tls.Config, serverIP net.IP) {
 	c := client{
 		conn:     conn,
 		addr:     conn.RemoteAddr().(*net.TCPAddr),
 		laddr:    conn.LocalAddr().(*net.TCPAddr),
+		serverIP: serverIP,
 		tcpPorts: make(map[int]bool),
 		udpPorts: make(map[int]bool),
 	}

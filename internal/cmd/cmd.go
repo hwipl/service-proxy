@@ -21,9 +21,6 @@ const (
 var (
 	// serverAddr is the default listen address of the control server
 	serverAddr = fmt.Sprintf(":%d", defaultPort)
-	// serverIP is the IP address the server runs services on, derived from
-	// the serverAddr
-	serverIP net.IP
 	// clientAddr is the address of a control server the client connects to
 	clientAddr = ""
 	// registerServices is a comma-separated list of services to register
@@ -91,10 +88,6 @@ func parseCACertFiles() *x509.CertPool {
 // run in server mode
 func runServer() {
 	cntrlAddr := parseTCPAddr(serverAddr)
-	if cntrlAddr.IP != nil {
-		// user supplied an ip address, update serverIP with it
-		serverIP = cntrlAddr.IP
-	}
 
 	// parse certificates
 	var tlsConfig *tls.Config
