@@ -90,12 +90,10 @@ func parseCACertFiles() *x509.CertPool {
 
 // run in server mode
 func runServer() {
-	ip := ""
 	cntrlAddr := parseTCPAddr(serverAddr)
 	if cntrlAddr.IP != nil {
 		// user supplied an ip address, update serverIP with it
 		serverIP = cntrlAddr.IP
-		ip = fmt.Sprintf("%s", cntrlAddr.IP)
 	}
 
 	// parse certificates
@@ -112,20 +110,7 @@ func runServer() {
 		}
 	}
 
-	// output info and start server
-	tlsInfo := ""
-	if tlsConfig != nil {
-		tlsInfo = "in mTLS mode "
-	}
-	log.Printf("Starting server %sand listening on %s:%d\n", tlsInfo, ip,
-		cntrlAddr.Port)
-	for _, ipNet := range allowedIPNets.getAll() {
-		log.Printf("Allowing control connections from %s\n", ipNet)
-	}
-	for _, portRange := range allowedPortRanges.getAll() {
-		log.Printf("Allowing port range %s in service registrations\n",
-			portRange)
-	}
+	// start server
 	RunControlServer(cntrlAddr, tlsConfig, allowedIPs, allowedPorts)
 }
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -69,6 +70,24 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 		}
 	}
 
-	// run control server
+	// output info and run control server
+	ip := ""
+	if addr.IP != nil {
+		ip = fmt.Sprintf("%s", addr.IP)
+	}
+	tlsInfo := ""
+	if tlsConfig != nil {
+		tlsInfo = "in mTLS mode "
+	}
+	log.Printf("Starting server %sand listening on %s:%d\n", tlsInfo, ip,
+		addr.Port)
+	for _, ipNet := range allowedIPNets.getAll() {
+		log.Printf("Allowing control connections from %s\n", ipNet)
+	}
+	for _, portRange := range allowedPortRanges.getAll() {
+		log.Printf("Allowing port range %s in service registrations\n",
+			portRange)
+	}
+
 	c.runServer()
 }
