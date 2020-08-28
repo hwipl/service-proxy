@@ -1,14 +1,16 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 )
 
 // controlServer stores controlServer server information
 type controlServer struct {
-	addr     *net.TCPAddr
-	listener *net.TCPListener
+	addr      *net.TCPAddr
+	tlsConfig *tls.Config
+	listener  *net.TCPListener
 }
 
 // runServer runs the control server
@@ -42,10 +44,11 @@ func (c *controlServer) runServer() {
 }
 
 // RunControlServer runs the control server on addr
-func RunControlServer(addr *net.TCPAddr) {
+func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config) {
 	// create control server
 	c := controlServer{
-		addr: addr,
+		addr:      addr,
+		tlsConfig: tlsConfig,
 	}
 
 	// run control server
