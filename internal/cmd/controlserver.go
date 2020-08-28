@@ -46,7 +46,7 @@ func (c *controlServer) runServer() {
 
 // RunControlServer runs the control server on addr
 func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
-	allowedIPs string) {
+	allowedIPs, allowedPorts string) {
 	// create control server
 	c := controlServer{
 		addr:      addr,
@@ -58,6 +58,14 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 		aIP := strings.Split(allowedIPs, ",")
 		for _, a := range aIP {
 			allowedIPNets.add(a)
+		}
+	}
+
+	// parse allowed ports
+	if allowedPorts != "" {
+		aPorts := strings.Split(allowedPorts, ",")
+		for _, a := range aPorts {
+			allowedPortRanges.add(a)
 		}
 	}
 
