@@ -31,27 +31,6 @@ func TestParseTCPAddr(t *testing.T) {
 	}
 }
 
-func TestParseAllowedPort(t *testing.T) {
-	parseAllowedPort("udp:1024")
-	parseAllowedPort("tcp:1024-2048")
-	parseAllowedPort("tcp:8192-4096")
-
-	want := "udp:1024-1024\n" +
-		"tcp:1024-2048\n" +
-		"tcp:4096-8192"
-	got := ""
-	for i, p := range allowedPortRanges.getAll() {
-		if i > 0 {
-			got += "\n"
-		}
-		got += p.String()
-	}
-
-	if got != want {
-		t.Errorf("got %s, want %s", got, want)
-	}
-}
-
 func createTestFile(name string, content []byte) *os.File {
 	tmpFile, err := ioutil.TempFile("", name)
 	if err != nil {

@@ -8,10 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"strconv"
 	"strings"
 
-	"github.com/hwipl/service-proxy/internal/network"
 	"github.com/hwipl/service-proxy/internal/pclient"
 )
 
@@ -63,51 +61,6 @@ func parseTCPAddr(addr string) *net.TCPAddr {
 	return cntrlAddr
 }
 
-func parseAllowedPort(port string) {
-	// get protocol and port range
-	protPorts := strings.Split(port, ":")
-	if len(protPorts) != 2 {
-		log.Fatal("cannot parse allowed port: ", port)
-	}
-
-	// parse protocol
-	protocol := uint8(0)
-	switch protPorts[0] {
-	case "tcp":
-		protocol = network.ProtocolTCP
-	case "udp":
-		protocol = network.ProtocolUDP
-	default:
-		log.Fatal("unknown protocol in allowed port: ", port)
-	}
-
-	// get min and max port from port range
-	minmax := strings.Split(protPorts[1], "-")
-	if len(minmax) < 1 || len(minmax) > 2 {
-		log.Fatal("cannot parse allowed port: ", port)
-	}
-	min, err := strconv.ParseUint(minmax[0], 10, 16)
-	if err != nil {
-		log.Fatal(err)
-	}
-	getMax := func() string {
-		if len(minmax) == 2 {
-			return minmax[1]
-		}
-		return minmax[0]
-	}
-	max, err := strconv.ParseUint(getMax(), 10, 16)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if min > max {
-		min, max = max, min
-	}
-
-	// add port range to allowed port ranges
-	allowedPortRanges.add(protocol, uint16(min), uint16(max))
-}
-
 func parseCertFiles() tls.Certificate {
 	if keyFile == "" {
 		log.Fatal("key file for this host's certificate must " +
@@ -157,7 +110,7 @@ func runServer() {
 	if allowedPorts != "" {
 		aPorts := strings.Split(allowedPorts, ",")
 		for _, a := range aPorts {
-			parseAllowedPort(a)
+			allowedPortRanges.add(a)
 		}
 	}
 

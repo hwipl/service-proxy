@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hwipl/service-proxy/internal/network"
 )
@@ -65,8 +68,8 @@ type portRangeList struct {
 	l []*portRange
 }
 
-// add adds protocol and ports min and max to the list
-func (p *portRangeList) add(protocol uint8, min, max uint16) {
+// addRange adds protocol and ports min and max to the list
+func (p *portRangeList) addRange(protocol uint8, min, max uint16) {
 	r := portRange{
 		protocol: protocol,
 		min:      min,
@@ -117,4 +120,50 @@ func (p *portRangeList) containsPort(protocol uint8, port uint16) bool {
 // getAll returns a list of all port ranges
 func (p *portRangeList) getAll() []*portRange {
 	return p.l
+}
+
+// add converts the string in port to a port range and adds it to the list
+func (p *portRangeList) add(port string) {
+	// get protocol and port range
+	protPorts := strings.Split(port, ":")
+	if len(protPorts) != 2 {
+		log.Fatal("cannot parse allowed port: ", port)
+	}
+
+	// parse protocol
+	protocol := uint8(0)
+	switch protPorts[0] {
+	case "tcp":
+		protocol = network.ProtocolTCP
+	case "udp":
+		protocol = network.ProtocolUDP
+	default:
+		log.Fatal("unknown protocol in allowed port: ", port)
+	}
+
+	// get min and max port from port range
+	minmax := strings.Split(protPorts[1], "-")
+	if len(minmax) < 1 || len(minmax) > 2 {
+		log.Fatal("cannot parse allowed port: ", port)
+	}
+	min, err := strconv.ParseUint(minmax[0], 10, 16)
+	if err != nil {
+		log.Fatal(err)
+	}
+	getMax := func() string {
+		if len(minmax) == 2 {
+			return minmax[1]
+		}
+		return minmax[0]
+	}
+	max, err := strconv.ParseUint(getMax(), 10, 16)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if min > max {
+		min, max = max, min
+	}
+
+	// add port range to allowed port ranges
+	p.addRange(protocol, uint16(min), uint16(max))
 }
