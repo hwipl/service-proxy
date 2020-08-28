@@ -41,8 +41,8 @@ func (c *control) runControl() {
 	}
 }
 
-// runControl runs the control server on addr
-func runControl(addr *net.TCPAddr) {
+// RunControl runs the control server on addr
+func RunControl(addr *net.TCPAddr) {
 	// create control server
 	c := control{
 		addr: addr,
