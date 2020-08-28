@@ -5,10 +5,6 @@ import (
 	"net"
 )
 
-var (
-	allowedIPNets ipNetList
-)
-
 // ipNetList is a list of IP network addresses
 type ipNetList struct {
 	l []*net.IPNet

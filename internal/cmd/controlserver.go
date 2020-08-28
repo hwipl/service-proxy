@@ -10,9 +10,10 @@ import (
 
 // controlServer stores controlServer server information
 type controlServer struct {
-	addr      *net.TCPAddr
-	tlsConfig *tls.Config
-	listener  *net.TCPListener
+	addr       *net.TCPAddr
+	tlsConfig  *tls.Config
+	listener   *net.TCPListener
+	allowedIPs ipNetList
 }
 
 // runServer runs the control server
@@ -33,7 +34,7 @@ func (c *controlServer) runServer() {
 
 		// if connection is not from an allowed ip, drop it
 		ip := conn.RemoteAddr().(*net.TCPAddr).IP
-		if !allowedIPNets.containsIP(ip) {
+		if !c.allowedIPs.containsIP(ip) {
 			log.Printf("Dropping new connection from %s: "+
 				"IP not allowed\n", conn.RemoteAddr())
 			conn.Close()
@@ -58,7 +59,7 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 	if allowedIPs != "" {
 		aIP := strings.Split(allowedIPs, ",")
 		for _, a := range aIP {
-			allowedIPNets.add(a)
+			c.allowedIPs.add(a)
 		}
 	}
 
@@ -81,7 +82,7 @@ func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
 	}
 	log.Printf("Starting server %sand listening on %s:%d\n", tlsInfo, ip,
 		addr.Port)
-	for _, ipNet := range allowedIPNets.getAll() {
+	for _, ipNet := range c.allowedIPs.getAll() {
 		log.Printf("Allowing control connections from %s\n", ipNet)
 	}
 	for _, portRange := range allowedPortRanges.getAll() {
