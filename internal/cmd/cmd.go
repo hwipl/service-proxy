@@ -116,11 +116,7 @@ func runServer() {
 
 // run in client mode
 func runClient() {
-	ip := ""
 	cntrlAddr := parseTCPAddr(clientAddr)
-	if cntrlAddr.IP != nil {
-		ip = fmt.Sprintf("%s", cntrlAddr.IP)
-	}
 	if cntrlAddr.Port == 0 {
 		cntrlAddr.Port = defaultPort
 	}
@@ -142,14 +138,6 @@ func runClient() {
 	if registerServices == "" {
 		log.Fatal("No services specified")
 	}
-
-	// print server info and run control client
-	tlsInfo := ""
-	if tlsConfig != nil {
-		tlsInfo = "in mTLS mode "
-	}
-	log.Printf("Starting client %sand connecting to server %s:%d\n",
-		tlsInfo, ip, cntrlAddr.Port)
 
 	// connect to server and configure services
 	pclient.RunControlClient(cntrlAddr, tlsConfig, registerServices)

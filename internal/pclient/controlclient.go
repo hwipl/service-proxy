@@ -2,6 +2,7 @@ package pclient
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -105,6 +106,18 @@ func RunControlClient(cntrlAddr *net.TCPAddr, tlsConfig *tls.Config,
 	for _, s := range services {
 		specs = append(specs, ParseServiceSpec(s))
 	}
+
+	// print info and run control client
+	ip := ""
+	if cntrlAddr.IP != nil {
+		ip = fmt.Sprintf("%s", cntrlAddr.IP)
+	}
+	tlsInfo := ""
+	if tlsConfig != nil {
+		tlsInfo = "in mTLS mode "
+	}
+	log.Printf("Starting client %sand connecting to server %s:%d\n",
+		tlsInfo, ip, cntrlAddr.Port)
 
 	// create and run control client
 	c := controlClient{
