@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net"
+	"strings"
 )
 
 // controlServer stores controlServer server information
@@ -44,11 +45,20 @@ func (c *controlServer) runServer() {
 }
 
 // RunControlServer runs the control server on addr
-func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config) {
+func RunControlServer(addr *net.TCPAddr, tlsConfig *tls.Config,
+	allowedIPs string) {
 	// create control server
 	c := controlServer{
 		addr:      addr,
 		tlsConfig: tlsConfig,
+	}
+
+	// parse allowed IP addresses
+	if allowedIPs != "" {
+		aIP := strings.Split(allowedIPs, ",")
+		for _, a := range aIP {
+			allowedIPNets.add(a)
+		}
 	}
 
 	// run control server

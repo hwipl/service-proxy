@@ -98,14 +98,6 @@ func runServer() {
 		ip = fmt.Sprintf("%s", cntrlAddr.IP)
 	}
 
-	// parse allowed IP addresses
-	if allowedIPs != "" {
-		aIP := strings.Split(allowedIPs, ",")
-		for _, a := range aIP {
-			allowedIPNets.add(a)
-		}
-	}
-
 	// parse allowed ports
 	if allowedPorts != "" {
 		aPorts := strings.Split(allowedPorts, ",")
@@ -142,7 +134,7 @@ func runServer() {
 		log.Printf("Allowing port range %s in service registrations\n",
 			portRange)
 	}
-	RunControlServer(cntrlAddr, tlsConfig)
+	RunControlServer(cntrlAddr, tlsConfig, allowedIPs)
 }
 
 // run in client mode
