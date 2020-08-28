@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/hwipl/service-proxy/internal/pclient"
+	"github.com/hwipl/service-proxy/internal/pserver"
 )
 
 const (
@@ -104,7 +105,8 @@ func runServer() {
 	}
 
 	// start server
-	RunControlServer(cntrlAddr, tlsConfig, allowedIPs, allowedPorts)
+	pserver.RunControlServer(cntrlAddr, tlsConfig, allowedIPs,
+		allowedPorts)
 }
 
 // run in client mode
