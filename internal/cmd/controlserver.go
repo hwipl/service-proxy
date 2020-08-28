@@ -39,7 +39,7 @@ func (c *controlServer) runServer() {
 		}
 
 		// handle client connection
-		handleClient(conn)
+		handleClient(conn, c.tlsConfig)
 	}
 }
 

@@ -170,7 +170,7 @@ func (c *client) stopClient() {
 }
 
 // handleClient handles the client with its control connection conn
-func handleClient(conn net.Conn) {
+func handleClient(conn net.Conn, tlsConfig *tls.Config) {
 	c := client{
 		conn:     conn,
 		addr:     conn.RemoteAddr().(*net.TCPAddr),
