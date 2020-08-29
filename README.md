@@ -32,7 +32,7 @@ You can run `service-proxy` with the following command line arguments:
 ```
 
 On a server, it is recommended to use certificates to authenticate clients (see
-`-cert`, `-key`, `ca-certs), to restrict the address to listen on and the
+`-cert`, `-key`, `ca-certs`), to restrict the address to listen on and the
 addresses to accept connections from (see `-s`, `-allowed-ips`), and to
 restrict the ports that can be registered (see `-allowed-ports`).
 
