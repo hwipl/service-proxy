@@ -99,8 +99,8 @@ func (c *controlClient) runClient() {
 
 // RunControlClient runs the control client
 func RunControlClient(cntrlAddr *net.TCPAddr, tlsConfig *tls.Config,
-	// parse service specifications (format "<protocol>:<port>:<destPort>")
 	serviceSpecs string) {
+	// parse service specifications (format "<protocol>:<port>:<destPort>")
 	services := strings.Split(serviceSpecs, ",")
 	var specs []*ServiceSpec
 	for _, s := range services {
