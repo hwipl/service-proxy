@@ -65,3 +65,16 @@ server$ service-proxy -s 192.168.1.1 \
         -ca-certs client-cert.pem \
         -allowed-ips 192.168.1.0/24 -allowed-ports tcp:32000-42000
 ```
+
+Running the client connecting to the server's IP address `192.168.1.1`, in mTLS
+mode with certificate `client-cert.pem` and key `client-key.pem`, treating the
+certificate `server-cert.pem` as a CA certificate, and registering TCP ports
+32000 and 32001 on the server with forwarding to port 32000 and 8080 on the
+client:
+
+```
+client$ service-proxy -c 192.168.1.1 \
+        -cert client-cert.pem -key client-key.pem \
+        -ca-certs server-cert.pem \
+        -r tcp:32000:32000,tcp:32001:8080
+```
