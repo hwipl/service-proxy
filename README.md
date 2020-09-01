@@ -53,3 +53,15 @@ client$ openssl req -newkey rsa:4096 -new -nodes -x509 -days 3650 \
         -out client-cert.pem -keyout client-key.pem \
         -subj "/C=US/CN=client"
 ```
+
+Running the server listening on IP address `192.168.1.1`, in mTLS mode with
+certificate `server-cert.pem` and key `server-key.pem`, treating the client
+certificate `client-cert.pem` as a CA certificate, accepting connections from
+`192.168.1.0/24`, and allowing TCP ports 32000-42000 for service registrations:
+
+```
+server$ service-proxy -s 192.168.1.1 \
+        -cert server-cert.pem -key server-key.pem \
+        -ca-certs client-cert.pem \
+        -allowed-ips 192.168.1.0/24 -allowed-ports tcp:32000-42000
+```
