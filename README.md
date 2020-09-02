@@ -1,6 +1,21 @@
 # service-proxy
 
-TODO
+Service-proxy is a reverse proxy server and client. The server is controlled by
+the client: clients connect to the server and register services and, thus, open
+ports on the server. The server then forwards traffic between these ports and
+the respective client ports.
+
+```
+           +--------+                         +--------+
+           | Server |<---register services:---| Client |
+           |        |    port x <-> u         |        |
+           |        |    port y <-> v         |        |
+           |        |                         |        |
+Peer1 <--->[ port x ]<----forward traffic---->[ port u ]
+PeerN <--->[ port y ]<----forward traffic---->[ port v ]
+           |        |                         |        |
+           +--------+                         +--------+
+```
 
 ## Usage
 
